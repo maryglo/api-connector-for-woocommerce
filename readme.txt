@@ -27,3 +27,16 @@ See docs/PRD.md for product requirements.
 
 = 0.1.0 =
 * Plugin skeleton, Composer PSR-4 autoload, activation and deactivation.
+* Settings Page
+* API URL
+* Bearer/API-key authentication
+* Order event
+* Order field mapping
+* Customer mapping
+* Nested JSON
+* HTTP client
+* Logging
+* Test connection
+* Test mapping
+* Action Scheduler
+* Retry
