@@ -1,0 +1,10 @@
+.wcac-settings .wcac-http-method {
+	display: inline-block;
+	margin-right: 8px;
+	min-width: 3em;
+}
+
+.wcac-settings .form-table td fieldset label {
+	display: inline-block;
+	margin: 0.15em 0;
+}
