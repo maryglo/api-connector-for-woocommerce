@@ -63,4 +63,23 @@ final class ApiClientTest extends TestCase
 		self::assertSame(0, $response->status_code);
 		self::assertSame('Connection timed out.', $response->error_message);
 	}
+
+	public function test_logged_bodies_are_truncated_at_64kb(): void
+	{
+		$short = str_repeat('a', ApiClient::MAX_BODY_LENGTH);
+		self::assertSame($short, ApiClient::truncate_logged_body($short));
+
+		$truncated = ApiClient::truncate_logged_body($short . 'b');
+		self::assertSame(ApiClient::MAX_BODY_LENGTH + 3, strlen($truncated));
+		self::assertStringEndsWith('…', $truncated);
+
+		WcacHttpTestTransport::$next_response = array(
+			'code'    => 200,
+			'body'    => str_repeat('x', ApiClient::MAX_BODY_LENGTH + 10),
+			'headers' => array(),
+		);
+
+		$response = (new ApiClient(array()))->request('GET', 'https://api.example.com/health');
+		self::assertSame(ApiClient::MAX_BODY_LENGTH + 3, strlen($response->body));
+	}
 }

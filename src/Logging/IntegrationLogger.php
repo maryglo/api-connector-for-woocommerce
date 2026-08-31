@@ -23,7 +23,22 @@ final class IntegrationLogger
 
 	public static function running(int $id, string $method, string $url, string $body): int
 	{
-		return self::update($id, array('status' => 'running', 'attempts' => self::attempts($id) + 1, 'request_method' => $method, 'request_url' => $url, 'request_body' => $body));
+		$log = self::find($id);
+
+		if (! $log) {
+			return 0;
+		}
+
+		$attempts = (int) $log->attempts + 1;
+		$updated  = self::update($id, array(
+			'status'         => 'running',
+			'attempts'       => $attempts,
+			'request_method' => $method,
+			'request_url'    => $url,
+			'request_body'   => \WooCommerceApiConnector\Api\ApiClient::truncate_logged_body($body),
+		));
+
+		return $updated > 0 ? $attempts : 0;
 	}
 
 	/** @param array<string, mixed> $data */

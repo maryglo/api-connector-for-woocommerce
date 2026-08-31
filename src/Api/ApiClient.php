@@ -17,7 +17,7 @@ final class ApiClient
 {
 	private const TIMEOUT = 15;
 
-	private const MAX_RESPONSE_BODY_LENGTH = 65536;
+	public const MAX_BODY_LENGTH = 65536;
 
 	/**
 	 * @param array<string, mixed> $settings
@@ -62,7 +62,7 @@ final class ApiClient
 
 		return new Response(
 			(int) wp_remote_retrieve_response_code($response),
-			self::truncate_body((string) wp_remote_retrieve_body($response)),
+			self::truncate_logged_body((string) wp_remote_retrieve_body($response)),
 			$headers
 		);
 	}
@@ -98,12 +98,12 @@ final class ApiClient
 		return array_merge($headers, BearerAuth::headers($token));
 	}
 
-	private static function truncate_body(string $body): string
+	public static function truncate_logged_body(string $body): string
 	{
-		if (strlen($body) <= self::MAX_RESPONSE_BODY_LENGTH) {
+		if (strlen($body) <= self::MAX_BODY_LENGTH) {
 			return $body;
 		}
 
-		return substr($body, 0, self::MAX_RESPONSE_BODY_LENGTH) . '…';
+		return substr($body, 0, self::MAX_BODY_LENGTH) . '…';
 	}
 }

@@ -6,6 +6,12 @@ define('ABSPATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
+final class WcacOptionStore
+{
+	/** @var array<string, mixed> */
+	public static array $options = array();
+}
+
 final class WcacHttpTestTransport
 {
 	/** @var array<string, mixed> */
@@ -44,6 +50,36 @@ if (! function_exists('wp_json_encode')) {
 	function wp_json_encode(mixed $value): string|false
 	{
 		return json_encode($value);
+	}
+}
+
+if (! function_exists('get_option')) {
+	function get_option(string $option, mixed $default = false): mixed
+	{
+		return WcacOptionStore::$options[$option] ?? $default;
+	}
+}
+
+if (! function_exists('update_option')) {
+	function update_option(string $option, mixed $value, mixed $autoload = null): bool
+	{
+		WcacOptionStore::$options[$option] = $value;
+
+		return true;
+	}
+}
+
+if (! function_exists('sanitize_text_field')) {
+	function sanitize_text_field(string $value): string
+	{
+		return trim(strip_tags($value));
+	}
+}
+
+if (! function_exists('esc_url_raw')) {
+	function esc_url_raw(string $url): string
+	{
+		return $url;
 	}
 }
 

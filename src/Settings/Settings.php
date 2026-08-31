@@ -73,6 +73,12 @@ final class Settings
 			is_array($saved['events'] ?? null) ? $saved['events'] : array()
 		);
 
+		// Mapping rows are an ordered list, not a keyed settings group. Merging it
+		// recursively would restore default rows the merchant intentionally removed.
+		if (is_array($saved['mapping'] ?? null)) {
+			$settings['mapping'] = $saved['mapping'];
+		}
+
 		return $settings;
 	}
 

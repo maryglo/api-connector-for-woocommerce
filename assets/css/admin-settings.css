@@ -8,3 +8,8 @@
 	display: inline-block;
 	margin: 0.15em 0;
 }
+
+.wcac-settings .wcac-mapping-table th:last-child,
+.wcac-settings .wcac-mapping-table td:last-child {
+	width: 8em;
+}

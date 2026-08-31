@@ -2,14 +2,52 @@
 	var select = document.getElementById("wcac_auth_method");
 	var row = document.querySelector(".wcac-api-key-header");
 
-	if (!select || !row) {
+	if (select && row) {
+		function toggleHeaderRow() {
+			row.hidden = select.value !== "api_key";
+		}
+
+		select.addEventListener("change", toggleHeaderRow);
+		toggleHeaderRow();
+	}
+
+	var tbody = document.getElementById("wcac-mapping-rows");
+	var addButton = document.getElementById("wcac-add-mapping-row");
+	var template = document.getElementById("wcac-mapping-row-template");
+
+	if (!tbody || !addButton || !template) {
 		return;
 	}
 
-	function toggleHeaderRow() {
-		row.hidden = select.value !== "api_key";
+	function nextIndex() {
+		var max = -1;
+		tbody.querySelectorAll("select[name^='wcac_mapping']").forEach(function (selectEl) {
+			var match = selectEl.name.match(/^wcac_mapping\[(\d+)\]/);
+			if (match) {
+				max = Math.max(max, parseInt(match[1], 10));
+			}
+		});
+		return max + 1;
 	}
 
-	select.addEventListener("change", toggleHeaderRow);
-	toggleHeaderRow();
+	addButton.addEventListener("click", function () {
+		var html = template.innerHTML.replace(/__INDEX__/g, String(nextIndex()));
+		tbody.insertAdjacentHTML("beforeend", html);
+	});
+
+	tbody.addEventListener("click", function (event) {
+		var button = event.target.closest(".wcac-remove-mapping-row");
+		if (!button) {
+			return;
+		}
+
+		var mappingRow = button.closest("tr");
+		if (mappingRow) {
+			mappingRow.remove();
+		}
+
+		if (!tbody.querySelector("tr")) {
+			addButton.click();
+		}
+	});
 })();

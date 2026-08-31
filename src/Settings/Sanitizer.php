@@ -40,6 +40,8 @@ final class Sanitizer
 
 		$events_raw = isset($raw['events']) && is_array($raw['events']) ? $raw['events'] : array();
 
+		$mapping = $existing['mapping'] ?? null;
+
 		return array(
 			'api_name'          => sanitize_text_field(isset($raw['api_name']) ? (string) $raw['api_name'] : ''),
 			'base_url'          => self::sanitize_base_url(isset($raw['base_url']) ? (string) $raw['base_url'] : ''),
@@ -55,6 +57,7 @@ final class Sanitizer
 				'order_created'   => ! empty($events_raw['order_created']),
 				'order_completed' => ! empty($events_raw['order_completed']),
 			),
+			'mapping'           => is_array($mapping) ? $mapping : Settings::default_mapping(),
 		);
 	}
 

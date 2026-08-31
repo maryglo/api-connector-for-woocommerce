@@ -25,36 +25,230 @@ final class MappingPage
 
 	public static function handle_post(): void
 	{
-		if (! is_admin() || ! current_user_can('manage_woocommerce') || empty($_POST['wcac_mapping_action'])) { return; }
+		if (! is_admin() || ! current_user_can('manage_woocommerce') || empty($_POST['wcac_mapping_action'])) {
+			return;
+		}
+
 		check_admin_referer('wcac_mapping', 'wcac_mapping_nonce');
 		$action = sanitize_key((string) $_POST['wcac_mapping_action']);
-		if ('save' === $action) {
-			$rows = self::rows_from_post(wp_unslash($_POST));
-			$errors = MappingValidator::validate_rows($rows);
-			if (array() !== $errors) { self::notice('error', implode(' ', $errors)); } else { $settings = Settings::get(); $settings['mapping'] = $rows; Settings::save($settings); self::notice('success', __('Mapping saved.', Plugin::TEXT_DOMAIN)); }
+		$rows   = self::rows_from_post(wp_unslash($_POST));
+
+		if ('add_row' === $action) {
+			$rows[] = array('source' => 'order_id', 'destination' => '');
+			self::store_draft($rows);
 			self::redirect();
 		}
+
+		if ('save' === $action) {
+			$errors = MappingValidator::validate_rows($rows);
+
+			if (array() !== $errors) {
+				self::store_draft($rows);
+				self::notice('error', implode(' ', $errors));
+			} else {
+				$settings            = Settings::get();
+				$settings['mapping'] = $rows;
+				Settings::save($settings);
+				self::notice('success', __('Mapping saved.', Plugin::TEXT_DOMAIN));
+			}
+
+			self::redirect();
+		}
+
 		$order_id = absint($_POST['order_id'] ?? 0);
-		$order = wc_get_order($order_id);
-		if (! $order) { self::notice('error', __('Choose a valid order.', Plugin::TEXT_DOMAIN)); self::redirect(); }
-		if ('send' === $action) { $log_id = IntegrationLogger::create('order.test', 'order', $order_id, true); SendIntegrationJob::enqueue($log_id, $order_id, 'order.test', true); self::notice('success', __('Test request queued. View its result in Logs.', Plugin::TEXT_DOMAIN)); self::redirect(); }
-		set_transient('wcac_mapping_payload_' . get_current_user_id(), wp_json_encode((new MappingEngine())->map($order, Settings::get()['mapping']), JSON_PRETTY_PRINT), 60);
+		$order    = wc_get_order($order_id);
+
+		if (! $order) {
+			self::notice('error', __('Choose a valid order.', Plugin::TEXT_DOMAIN));
+			self::redirect();
+		}
+
+		if ('send' === $action) {
+			$log_id = IntegrationLogger::create('order.test', 'order', $order_id, true);
+			SendIntegrationJob::enqueue($log_id, $order_id, 'order.test', true);
+			self::notice('success', __('Test request queued. View its result in Logs.', Plugin::TEXT_DOMAIN));
+			self::redirect();
+		}
+
+		set_transient(
+			'wcac_mapping_payload_' . get_current_user_id(),
+			wp_json_encode((new MappingEngine())->map($order, Settings::get()['mapping']), JSON_PRETTY_PRINT),
+			60
+		);
 		self::redirect();
 	}
 
 	public static function render_content(): void
 	{
-		$settings = Settings::get(); $rows = $settings['mapping']; $payload = get_transient('wcac_mapping_payload_' . get_current_user_id()); delete_transient('wcac_mapping_payload_' . get_current_user_id());
+		$settings = Settings::get();
+		$draft    = get_transient(self::draft_key());
+		delete_transient(self::draft_key());
+		$rows = is_array($draft)
+			? $draft
+			: (is_array($settings['mapping'] ?? null) ? $settings['mapping'] : Settings::default_mapping());
+
+		if (array() === $rows) {
+			$rows = array(array('source' => 'order_id', 'destination' => ''));
+		}
+
+		$payload = get_transient('wcac_mapping_payload_' . get_current_user_id());
+		delete_transient('wcac_mapping_payload_' . get_current_user_id());
 		?>
 		<?php self::render_notice(); ?>
-		<form method="post"><?php wp_nonce_field('wcac_mapping', 'wcac_mapping_nonce'); ?><h2><?php esc_html_e('Order Mapping', Plugin::TEXT_DOMAIN); ?></h2><p><?php esc_html_e('Use dot paths for nested values and items[].field for order line items.', Plugin::TEXT_DOMAIN); ?></p><table class="widefat"><thead><tr><th><?php esc_html_e('WooCommerce field', Plugin::TEXT_DOMAIN); ?></th><th><?php esc_html_e('API field', Plugin::TEXT_DOMAIN); ?></th></tr></thead><tbody><?php foreach ($rows as $index => $row) : ?><tr><td><select name="wcac_mapping[<?php echo esc_attr((string) $index); ?>][source]"><?php self::source_options((string) $row['source']); ?></select></td><td><input class="regular-text" name="wcac_mapping[<?php echo esc_attr((string) $index); ?>][destination]" value="<?php echo esc_attr((string) $row['destination']); ?>" /></td></tr><?php endforeach; ?></tbody></table><p><button class="button button-primary" name="wcac_mapping_action" value="save"><?php esc_html_e('Save mapping', Plugin::TEXT_DOMAIN); ?></button></p></form>
-		<form method="post"><hr /><h2><?php esc_html_e('Test Mapping', Plugin::TEXT_DOMAIN); ?></h2><?php wp_nonce_field('wcac_mapping', 'wcac_mapping_nonce'); ?><select name="order_id"><?php foreach (wc_get_orders(array('limit'=>50,'orderby'=>'ID','order'=>'DESC','return'=>'objects')) as $order) : ?><option value="<?php echo esc_attr((string) $order->get_id()); ?>">#<?php echo esc_html($order->get_order_number()); ?></option><?php endforeach; ?></select> <button class="button" name="wcac_mapping_action" value="preview"><?php esc_html_e('Test Mapping', Plugin::TEXT_DOMAIN); ?></button> <button class="button" name="wcac_mapping_action" value="send"><?php esc_html_e('Send Test Request', Plugin::TEXT_DOMAIN); ?></button></form><?php if (is_string($payload)) : ?><h2><?php esc_html_e('Generated Payload', Plugin::TEXT_DOMAIN); ?></h2><pre><?php echo esc_html($payload); ?></pre><?php endif; ?><?php
+		<form method="post">
+			<?php wp_nonce_field('wcac_mapping', 'wcac_mapping_nonce'); ?>
+			<h2><?php esc_html_e('Order Mapping', Plugin::TEXT_DOMAIN); ?></h2>
+			<p><?php esc_html_e('Use dot paths for nested values and items[].field for order line items.', Plugin::TEXT_DOMAIN); ?></p>
+			<table class="widefat wcac-mapping-table">
+				<thead>
+					<tr>
+						<th><?php esc_html_e('WooCommerce field', Plugin::TEXT_DOMAIN); ?></th>
+						<th><?php esc_html_e('API field', Plugin::TEXT_DOMAIN); ?></th>
+						<th><?php esc_html_e('Actions', Plugin::TEXT_DOMAIN); ?></th>
+					</tr>
+				</thead>
+				<tbody id="wcac-mapping-rows">
+					<?php foreach ($rows as $index => $row) : ?>
+						<?php self::render_row((int) $index, (string) ($row['source'] ?? ''), (string) ($row['destination'] ?? '')); ?>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+			<p>
+				<button type="button" class="button" id="wcac-add-mapping-row"><?php esc_html_e('Add row', Plugin::TEXT_DOMAIN); ?></button>
+				<noscript><button class="button" name="wcac_mapping_action" value="add_row"><?php esc_html_e('Add row', Plugin::TEXT_DOMAIN); ?></button></noscript>
+				<button class="button button-primary" name="wcac_mapping_action" value="save"><?php esc_html_e('Save mapping', Plugin::TEXT_DOMAIN); ?></button>
+			</p>
+		</form>
+		<template id="wcac-mapping-row-template">
+			<?php self::render_row('__INDEX__', 'order_id', ''); ?>
+		</template>
+		<form method="post">
+			<hr />
+			<h2><?php esc_html_e('Test Mapping', Plugin::TEXT_DOMAIN); ?></h2>
+			<?php wp_nonce_field('wcac_mapping', 'wcac_mapping_nonce'); ?>
+			<select name="order_id">
+				<?php foreach (wc_get_orders(array('limit' => 50, 'orderby' => 'ID', 'order' => 'DESC', 'return' => 'objects')) as $order) : ?>
+					<option value="<?php echo esc_attr((string) $order->get_id()); ?>">#<?php echo esc_html($order->get_order_number()); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<button class="button" name="wcac_mapping_action" value="preview"><?php esc_html_e('Test Mapping', Plugin::TEXT_DOMAIN); ?></button>
+			<button class="button" name="wcac_mapping_action" value="send"><?php esc_html_e('Send Test Request', Plugin::TEXT_DOMAIN); ?></button>
+		</form>
+		<?php if (is_string($payload)) : ?>
+			<h2><?php esc_html_e('Generated Payload', Plugin::TEXT_DOMAIN); ?></h2>
+			<pre><?php echo esc_html($payload); ?></pre>
+		<?php endif; ?>
+		<?php
 	}
 
-	/** @return list<array{source: string, destination: string}> */
-	private static function rows_from_post(array $post): array { $rows = array(); foreach (($post['wcac_mapping'] ?? array()) as $row) { if (is_array($row)) { $rows[] = array('source'=>sanitize_key((string)($row['source']??'')), 'destination'=>sanitize_text_field((string)($row['destination']??''))); } } return $rows; }
-	private static function source_options(string $selected): void { foreach (array('order_id'=>'Order ID','order_number'=>'Order number','status'=>'Status','currency'=>'Currency','total'=>'Total','date_created'=>'Date created','billing_first_name'=>'Billing first name','billing_last_name'=>'Billing last name','billing_email'=>'Billing email','billing_phone'=>'Billing phone','item_product_id'=>'Item product ID','item_sku'=>'Item SKU','item_name'=>'Item name','item_quantity'=>'Item quantity','item_subtotal'=>'Item subtotal') as $value=>$label) { printf('<option value="%s" %s>%s</option>', esc_attr($value), selected($selected,$value,false), esc_html__($label,Plugin::TEXT_DOMAIN)); } }
-	private static function notice(string $type, string $message): void { set_transient('wcac_mapping_notice_' . get_current_user_id(), array($type,$message), 30); }
-	private static function render_notice(): void { $notice=get_transient('wcac_mapping_notice_'.get_current_user_id()); delete_transient('wcac_mapping_notice_'.get_current_user_id()); if (is_array($notice)) { printf('<div class="notice notice-%s"><p>%s</p></div>', esc_attr('success'===$notice[0]?'success':'error'), esc_html($notice[1])); } }
-	private static function redirect(): never { wp_safe_redirect(admin_url('admin.php?page=' . SettingsPage::MENU_SLUG . '&tab=' . SettingsPage::TAB_MAPPING)); exit; }
+	private static function render_row(int|string $index, string $source, string $destination): void
+	{
+		?>
+		<tr class="wcac-mapping-row">
+			<td>
+				<select name="wcac_mapping[<?php echo esc_attr((string) $index); ?>][source]">
+					<?php self::source_options($source); ?>
+				</select>
+			</td>
+			<td>
+				<input class="regular-text" name="wcac_mapping[<?php echo esc_attr((string) $index); ?>][destination]" value="<?php echo esc_attr($destination); ?>" />
+			</td>
+			<td>
+				<button type="button" class="button wcac-remove-mapping-row"><?php esc_html_e('Remove', Plugin::TEXT_DOMAIN); ?></button>
+			</td>
+		</tr>
+		<?php
+	}
+
+	/**
+	 * @return list<array{source: string, destination: string}>
+	 */
+	private static function rows_from_post(array $post): array
+	{
+		$rows = array();
+
+		foreach (($post['wcac_mapping'] ?? array()) as $row) {
+			if (! is_array($row)) {
+				continue;
+			}
+
+			$source      = sanitize_key((string) ($row['source'] ?? ''));
+			$destination = sanitize_text_field((string) ($row['destination'] ?? ''));
+
+			if ('' === $source && '' === $destination) {
+				continue;
+			}
+
+			$rows[] = array(
+				'source'      => $source,
+				'destination' => $destination,
+			);
+		}
+
+		return $rows;
+	}
+
+	private static function source_options(string $selected): void
+	{
+		foreach (array(
+			'order_id'            => 'Order ID',
+			'order_number'        => 'Order number',
+			'status'              => 'Status',
+			'currency'           => 'Currency',
+			'total'               => 'Total',
+			'date_created'        => 'Date created',
+			'billing_first_name'  => 'Billing first name',
+			'billing_last_name'   => 'Billing last name',
+			'billing_email'       => 'Billing email',
+			'billing_phone'       => 'Billing phone',
+			'item_product_id'    => 'Item product ID',
+			'item_sku'            => 'Item SKU',
+			'item_name'           => 'Item name',
+			'item_quantity'       => 'Item quantity',
+			'item_subtotal'       => 'Item subtotal',
+		) as $value => $label) {
+			printf(
+				'<option value="%s" %s>%s</option>',
+				esc_attr($value),
+				selected($selected, $value, false),
+				esc_html__($label, Plugin::TEXT_DOMAIN)
+			);
+		}
+	}
+
+	private static function notice(string $type, string $message): void
+	{
+		set_transient('wcac_mapping_notice_' . get_current_user_id(), array($type, $message), 30);
+	}
+
+	/** @param list<array{source: string, destination: string}> $rows */
+	private static function store_draft(array $rows): void
+	{
+		set_transient(self::draft_key(), $rows, 5 * MINUTE_IN_SECONDS);
+	}
+
+	private static function draft_key(): string
+	{
+		return 'wcac_mapping_draft_' . get_current_user_id();
+	}
+
+	private static function render_notice(): void
+	{
+		$notice = get_transient('wcac_mapping_notice_' . get_current_user_id());
+		delete_transient('wcac_mapping_notice_' . get_current_user_id());
+
+		if (is_array($notice)) {
+			printf(
+				'<div class="notice notice-%s"><p>%s</p></div>',
+				esc_attr('success' === $notice[0] ? 'success' : 'error'),
+				esc_html($notice[1])
+			);
+		}
+	}
+
+	private static function redirect(): never
+	{
+		wp_safe_redirect(admin_url('admin.php?page=' . SettingsPage::MENU_SLUG . '&tab=' . SettingsPage::TAB_MAPPING));
+		exit;
+	}
 }
