@@ -48,19 +48,32 @@ final class SettingsPage
 			return;
 		}
 
+		$style_path     = WCAC_PATH . 'assets/css/admin-settings.css';
+		$script_path    = WCAC_PATH . 'assets/js/admin-settings.js';
+		$style_version  = is_readable($style_path) ? (string) filemtime($style_path) : WCAC_VERSION;
+		$script_version = is_readable($script_path) ? (string) filemtime($script_path) : WCAC_VERSION;
+
 		wp_enqueue_style(
 			'wcac-admin-settings',
 			WCAC_URL . 'assets/css/admin-settings.css',
 			array(),
-			WCAC_VERSION
+			$style_version
 		);
 
 		wp_enqueue_script(
 			'wcac-admin-settings',
 			WCAC_URL . 'assets/js/admin-settings.js',
 			array(),
-			WCAC_VERSION,
+			$script_version,
 			true
+		);
+
+		wp_localize_script(
+			'wcac-admin-settings',
+			'wcacAdminSettings',
+			array(
+				'confirmRemoveMappingRow' => __('Remove this mapping row?', Plugin::TEXT_DOMAIN),
+			)
 		);
 	}
 

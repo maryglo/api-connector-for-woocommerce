@@ -41,6 +41,14 @@
 			return;
 		}
 
+		var message = window.wcacAdminSettings && window.wcacAdminSettings.confirmRemoveMappingRow
+			? window.wcacAdminSettings.confirmRemoveMappingRow
+			: "Remove this mapping row?";
+
+		if (!window.confirm(message)) {
+			return;
+		}
+
 		var mappingRow = button.closest("tr");
 		if (mappingRow) {
 			mappingRow.remove();

@@ -3,7 +3,7 @@
  * Plugin Name:       WooCommerce Integration Connector
  * Plugin URI:        https://github.com/woocommerce-api-connector/woocommerce-api-connector
  * Description:       Send WooCommerce orders, customers, and products to external REST APIs using configurable field mappings.
- * Version:           0.1.0
+ * Version:           0.1.1
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Requires Plugins:  woocommerce
@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('WCAC_VERSION', '0.1.0');
+define('WCAC_VERSION', '0.1.1');
 define('WCAC_FILE', __FILE__);
 define('WCAC_PATH', plugin_dir_path(__FILE__));
 define('WCAC_URL', plugin_dir_url(__FILE__));

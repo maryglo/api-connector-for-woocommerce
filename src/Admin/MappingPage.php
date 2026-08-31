@@ -151,7 +151,13 @@ final class MappingPage
 				</select>
 			</td>
 			<td>
-				<input class="regular-text" name="wcac_mapping[<?php echo esc_attr((string) $index); ?>][destination]" value="<?php echo esc_attr($destination); ?>" />
+				<input
+					type="text"
+					class="regular-text"
+					name="wcac_mapping[<?php echo esc_attr((string) $index); ?>][destination]"
+					value="<?php echo esc_attr($destination); ?>"
+					placeholder="customer.email"
+				/>
 			</td>
 			<td>
 				<button type="button" class="button wcac-remove-mapping-row"><?php esc_html_e('Remove', Plugin::TEXT_DOMAIN); ?></button>
