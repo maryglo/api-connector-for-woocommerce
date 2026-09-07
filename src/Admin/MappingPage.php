@@ -136,7 +136,7 @@ final class MappingPage
 		</form>
 		<?php if (is_string($payload)) : ?>
 			<h2><?php esc_html_e('Generated Payload', Plugin::TEXT_DOMAIN); ?></h2>
-			<pre><?php echo esc_html($payload); ?></pre>
+			<pre style="background-color: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; overflow-x: auto;"><code><?php echo esc_html($payload); ?></code></pre>
 		<?php endif; ?>
 		<?php
 	}
