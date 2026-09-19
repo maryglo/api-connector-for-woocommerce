@@ -32,7 +32,17 @@ final class Sanitizer
 		$auth = self::sanitize_auth_method(isset($raw['auth_method']) ? (string) $raw['auth_method'] : '');
 
 		$posted_token = isset($raw['token']) ? (string) $raw['token'] : '';
-		$token        = $existing['token'] ?? '';
+		
+		/*
+		* The existing token is intentionally kept encrypted.
+		*
+		* If the admin leaves the password field blank, Settings::save()
+		* will preserve the existing encrypted credential.
+		*
+		* If a new credential is entered, it remains plaintext only in
+		* memory until Settings::save() encrypts it.
+		*/
+		$token = '';
 
 		if ('' !== trim($posted_token)) {
 			$token = sanitize_text_field($posted_token);

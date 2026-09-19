@@ -131,8 +131,26 @@ final class SettingsPage
 			self::redirect();
 		}
 
-		$result = ConnectionTester::test($settings);
-		self::store_notice($result['success'] ? 'success' : 'error', $result['message']);
+		try {
+			$result = ConnectionTester::test($settings);
+
+			self::store_notice(
+				$result['success'] ? 'success' : 'error',
+				$result['message']
+			);
+		} catch (\RuntimeException $exception) {
+			self::store_notice(
+				'error',
+				__('Unable to test the connection because the API credential configuration is incomplete.', Plugin::TEXT_DOMAIN)
+			);
+
+
+			if (defined('WP_DEBUG') && WP_DEBUG) {
+				error_log(
+					'WCAC connection test failed: ' . $exception->getMessage()
+				);
+			}
+		}
 		self::redirect();
 	}
 
@@ -145,7 +163,7 @@ final class SettingsPage
 		$tab = self::active_tab();
 		$settings = Settings::get();
 		self::render_notice();
-		?>
+?>
 		<div class="wrap woocommerce wcac-settings">
 			<h1><?php echo esc_html__('API Connector', Plugin::TEXT_DOMAIN); ?></h1>
 			<nav class="nav-tab-wrapper woo-nav-tab-wrapper">
@@ -154,22 +172,22 @@ final class SettingsPage
 				<?php self::tab_link(self::TAB_LOGS, __('Logs', Plugin::TEXT_DOMAIN), $tab); ?>
 			</nav>
 			<?php
-		if (self::TAB_MAPPING === $tab) {
-			MappingPage::render_content();
-			echo '</div>';
-			return;
-		}
+			if (self::TAB_MAPPING === $tab) {
+				MappingPage::render_content();
+				echo '</div>';
+				return;
+			}
 
-		if (self::TAB_LOGS === $tab) {
-			LogsPage::render_content();
-			echo '</div>';
-			return;
-		}
+			if (self::TAB_LOGS === $tab) {
+				LogsPage::render_content();
+				echo '</div>';
+				return;
+			}
 
-		$order_created   = ! empty($settings['events']['order_created']);
-		$order_completed = ! empty($settings['events']['order_completed']);
-		$is_api_key      = Sanitizer::AUTH_API_KEY === ($settings['auth_method'] ?? '');
-		?>
+			$order_created   = ! empty($settings['events']['order_created']);
+			$order_completed = ! empty($settings['events']['order_completed']);
+			$is_api_key      = Sanitizer::AUTH_API_KEY === ($settings['auth_method'] ?? '');
+			?>
 			<form method="post" action="<?php echo esc_url(admin_url('admin.php?page=' . self::MENU_SLUG)); ?>" autocomplete="off">
 				<?php wp_nonce_field('wcac_settings_save', 'wcac_settings_nonce'); ?>
 
@@ -186,8 +204,7 @@ final class SettingsPage
 								type="text"
 								class="regular-text"
 								value="<?php echo esc_attr((string) $settings['api_name']); ?>"
-								required
-							/>
+								required />
 							<p class="description"><?php echo esc_html__('Label used in the admin UI and logs.', Plugin::TEXT_DOMAIN); ?></p>
 						</td>
 					</tr>
@@ -203,8 +220,7 @@ final class SettingsPage
 								class="regular-text"
 								placeholder="https://api.example.com"
 								value="<?php echo esc_attr((string) $settings['base_url']); ?>"
-								required
-							/>
+								required />
 						</td>
 					</tr>
 					<tr>
@@ -218,8 +234,7 @@ final class SettingsPage
 								type="text"
 								class="regular-text"
 								placeholder="<?php echo esc_attr__('/ (base URL)', Plugin::TEXT_DOMAIN); ?>"
-								value="<?php echo esc_attr((string) $settings['health_path']); ?>"
-							/>
+								value="<?php echo esc_attr((string) $settings['health_path']); ?>" />
 							<p class="description"><?php echo esc_html__('Optional path for Test Connection. Leave empty to request the base URL.', Plugin::TEXT_DOMAIN); ?></p>
 						</td>
 					</tr>
@@ -250,8 +265,7 @@ final class SettingsPage
 								class="regular-text"
 								value=""
 								autocomplete="new-password"
-								placeholder="<?php echo Settings::has_token() ? esc_attr__('Saved — leave blank to keep', Plugin::TEXT_DOMAIN) : ''; ?>"
-							/>
+								placeholder="<?php echo Settings::has_token() ? esc_attr__('Saved — leave blank to keep', Plugin::TEXT_DOMAIN) : ''; ?>" />
 							<?php if (Settings::has_token()) : ?>
 								<p class="description"><?php echo esc_html__('A token is saved. Leave this field blank to keep it.', Plugin::TEXT_DOMAIN); ?></p>
 							<?php endif; ?>
@@ -267,8 +281,7 @@ final class SettingsPage
 								id="wcac_api_key_header"
 								type="text"
 								class="regular-text"
-								value="<?php echo esc_attr((string) $settings['api_key_header']); ?>"
-							/>
+								value="<?php echo esc_attr((string) $settings['api_key_header']); ?>" />
 							<p class="description"><?php echo esc_html__('HTTP header that carries the API key. Default: X-API-Key.', Plugin::TEXT_DOMAIN); ?></p>
 						</td>
 					</tr>
@@ -342,8 +355,7 @@ final class SettingsPage
 								id="wcac_order_endpoint"
 								type="text"
 								class="regular-text"
-								value="<?php echo esc_attr((string) $settings['order_endpoint']); ?>"
-							/>
+								value="<?php echo esc_attr((string) $settings['order_endpoint']); ?>" />
 							<p class="description"><?php echo esc_html__('Path relative to the base URL.', Plugin::TEXT_DOMAIN); ?></p>
 						</td>
 					</tr>
@@ -358,8 +370,7 @@ final class SettingsPage
 								id="wcac_customer_endpoint"
 								type="text"
 								class="regular-text"
-								value="<?php echo esc_attr((string) $settings['customer_endpoint']); ?>"
-							/>
+								value="<?php echo esc_attr((string) $settings['customer_endpoint']); ?>" />
 							<p class="description"><?php echo esc_html__('Stored for v0.2 customer events. Path relative to the base URL.', Plugin::TEXT_DOMAIN); ?></p>
 						</td>
 					</tr>
@@ -372,7 +383,7 @@ final class SettingsPage
 				</p>
 			</form>
 		</div>
-		<?php
+<?php
 	}
 
 	private static function store_notice(string $type, string $message): void

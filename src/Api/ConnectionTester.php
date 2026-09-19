@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WooCommerceApiConnector\Api;
 
 use WooCommerceApiConnector\Plugin;
+use WooCommerceApiConnector\Settings\Settings;
 
 defined('ABSPATH') || exit;
 

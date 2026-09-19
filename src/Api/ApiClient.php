@@ -6,6 +6,7 @@ namespace WooCommerceApiConnector\Api;
 
 use WooCommerceApiConnector\Api\Authentication\ApiKeyAuth;
 use WooCommerceApiConnector\Api\Authentication\BearerAuth;
+use WooCommerceApiConnector\Settings\Settings;
 use WooCommerceApiConnector\Settings\Sanitizer;
 
 defined('ABSPATH') || exit;
@@ -88,7 +89,8 @@ final class ApiClient
 			$headers['Content-Type'] = 'application/json';
 		}
 
-		$token  = (string) ($this->settings['token'] ?? '');
+
+	    $token  = Settings::resolve_auth_secret($this->settings);
 		$method = (string) ($this->settings['auth_method'] ?? Sanitizer::AUTH_BEARER);
 
 		if (Sanitizer::AUTH_API_KEY === $method) {

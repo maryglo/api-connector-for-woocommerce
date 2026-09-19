@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WooCommerceApiConnector\Settings;
 
 use WooCommerceApiConnector\Plugin;
+use WooCommerceApiConnector\Security\SecretManager;
 
 defined('ABSPATH') || exit;
 
@@ -13,6 +14,7 @@ defined('ABSPATH') || exit;
  */
 final class Settings
 {
+	public const API_KEY_CONSTANT = 'WCAC_API_KEY';
 	/**
 	 * @return array<string, mixed>
 	 */
@@ -87,11 +89,69 @@ final class Settings
 	 */
 	public static function save(array $settings): void
 	{
-		update_option(Plugin::OPTION_SETTINGS, $settings, false);
+		$existing = get_option(Plugin::OPTION_SETTINGS, array());
+
+		if (! is_array($existing)) {
+			$existing = array();
+		}
+
+		  /*
+         * An empty token means:
+         * "keep the existing credential".
+         */
+		  if (
+            isset($settings['token'])
+            && is_string($settings['token'])
+        ) {
+            if ('' === $settings['token']) {
+                $settings['token'] = $existing['token'] ?? '';
+            } else {
+                $settings['token'] = SecretManager::encrypt(
+                    $settings['token']
+                );
+            }
+        }
+
+        update_option(
+            Plugin::OPTION_SETTINGS,
+            $settings,
+            false
+        );
+	}
+
+	/**
+	 * Return the API credential for an API request.
+	 */
+	public static function get_auth_secret(): string
+	{
+		/*
+		  * Server-managed configuration takes precedence.
+		  */
+		if (
+			defined(self::API_KEY_CONSTANT)
+			&& is_string(constant(self::API_KEY_CONSTANT))
+			&& '' !== constant(self::API_KEY_CONSTANT)
+		) {
+			return constant(self::API_KEY_CONSTANT);
+		}
+
+		$settings = self::get();
+
+		$stored = $settings['token'] ?? '';
+
+		if (! is_string($stored) || '' === $stored) {
+			return '';
+		}
+
+		return SecretManager::decrypt($stored);
 	}
 
 	public static function get_string(string $key): string
 	{
+		if ('token' === $key) {
+			return '';
+		}
+
 		$value = self::get()[ $key ] ?? '';
 
 		return is_string($value) ? $value : '';
@@ -106,6 +166,39 @@ final class Settings
 
 	public static function has_token(): bool
 	{
-		return '' !== self::get_string('token');
+		if (
+			defined(self::API_KEY_CONSTANT)
+			&& is_string(constant(self::API_KEY_CONSTANT))
+			&& '' !== constant(self::API_KEY_CONSTANT)
+		) {
+			return true;
+		}
+
+		$settings = self::get();
+
+		return is_string($settings['token'] ?? '')
+			&& '' !== $settings['token'];
+	}
+
+	public static function resolve_auth_secret(array $settings): string
+	{
+		/*
+    	  * If the admin just entered a new token and clicked
+          * "Test Connection", use that unsaved token.
+          */
+		if (
+			isset($settings['token'])
+			&& is_string($settings['token'])
+			&& '' !== trim($settings['token'])
+		) {
+			return $settings['token'];
+		}
+
+		/*
+          * Otherwise retrieve the configured credential:
+          * - wp-config.php constant, if configured
+          * - encrypted token from wp_options
+          */
+		return self::get_auth_secret();
 	}
 }
