@@ -2,7 +2,7 @@
 Contributors: woocommerce-api-connector
 Tags: woocommerce, rest-api, integration, orders
 Requires at least: 6.4
-Tested up to: 6.6
+Tested with woocommerce: 11.1.0
 Requires PHP: 8.1
 Requires Plugins: woocommerce
 Stable tag: 0.1.1
@@ -172,26 +172,42 @@ WordPress Admin
 → WooCommerce Integration Connector
 ```
 
-### Requirements
+## Requirements
 
-- WordPress
-- WooCommerce
-- PHP 8.1+
-- WooCommerce HPOS-compatible environment
+- WordPress 7.1
+- WooCommerce 11.1.0
+- PHP 8.1 or newer
+- PHP Sodium extension
+- HTTPS recommended for production API communication
 
-The exact supported WordPress and WooCommerce versions should be verified against the release being installed.
+### Compatibility
 
----
+This plugin is currently developed and tested with:
+
+- **WordPress:** 7.1
+- **WooCommerce:** 11.1.0
+- **PHP:** 8.1+
+- **WooCommerce HPOS:** Supported
+
+Newer patch releases such as WordPress 7.1.1 and WooCommerce 11.1.1 should be tested before being listed as verified compatibility.
 
 ## ⚙️ Configuration
 
-After activating the plugin, open the WooCommerce integration settings.
+After activating the plugin, open:
+
+```text
+WordPress Admin
+→ WooCommerce
+→ API Connector
+```
 
 Configure:
 
 ```text
 API Connection
+├── API Name
 ├── API Base URL
+├── Health Path
 ├── Authentication method
 ├── API credentials
 └── Connection test
@@ -200,6 +216,10 @@ Order Events
 ├── Order created
 └── Order completed
 
+Endpoints
+├── Order endpoint
+└── Customer endpoint
+
 Field Mapping
 ├── Order fields
 ├── Customer fields
@@ -207,6 +227,75 @@ Field Mapping
 ```
 
 Save the configuration and use the built-in connection test to verify communication with the external API.
+
+### Required encryption key
+
+Before saving API credentials, configure a dedicated encryption key in `wp-config.php`.
+
+The plugin uses this key to encrypt API credentials before storing them in the WordPress database.
+
+Add:
+
+```php
+define('WCAC_ENCRYPTION_KEY', 'YOUR_BASE64_ENCODED_32_BYTE_KEY');
+```
+
+Generate a secure 32-byte key with PHP:
+
+```bash
+php -r "echo base64_encode(random_bytes(32)), PHP_EOL;"
+```
+
+Copy the generated value into `wp-config.php`:
+
+```php
+define('WCAC_ENCRYPTION_KEY', 'your-generated-base64-key');
+```
+
+Place the constant before:
+
+```php
+/* That's all, stop editing! Happy publishing. */
+```
+
+### Docker environments
+
+If WordPress is running in Docker, the key can be generated inside the WordPress container:
+
+```bash
+docker compose exec wordpress php -r "echo base64_encode(random_bytes(32)), PHP_EOL;"
+```
+
+The key can also be provided through the container environment.
+
+For example, in `.env`:
+
+```env
+WCAC_ENCRYPTION_KEY=your-generated-base64-key
+```
+
+Then expose it to the WordPress container and load it from `wp-config.php`:
+
+```php
+if (getenv('WCAC_ENCRYPTION_KEY')) {
+	define('WCAC_ENCRYPTION_KEY', getenv('WCAC_ENCRYPTION_KEY'));
+}
+```
+
+Do not commit `.env` files containing the encryption key to source control.
+
+### Encryption key requirements
+
+- The key must be a valid Base64-encoded 32-byte value.
+- Keep the encryption key secret.
+- Do not commit the encryption key to Git.
+- Do not place the key in plugin source code.
+- Do not use the external API credential as the encryption key.
+- Keep the same encryption key for the lifetime of the encrypted credentials.
+- Changing the encryption key will prevent previously encrypted credentials from being decrypted.
+- Back up the encryption key securely when backing up a production WordPress installation.
+
+After configuring the encryption key, enter the API credential in the API Connector settings and save the configuration.
 
 ---
 
@@ -230,9 +319,44 @@ Example:
 X-API-Key: YOUR_API_KEY
 ```
 
-Authentication details are stored using WordPress settings APIs and should never be committed to source control.
+The API credential is encrypted before being stored in the WordPress database.
 
-**Never place production API credentials in GitHub, screenshots, example configuration files, or issue reports.**
+Credentials are not rendered back into the settings form after being saved. The credential field remains empty and displays a saved-credential indicator when a credential is configured.
+
+When testing a connection, an administrator can enter a new credential and test it without first saving it.
+
+### Server-managed API credential
+
+For high-security deployments, an API credential can also be provided through the `WCAC_API_KEY` constant in `wp-config.php`.
+
+Example:
+
+```php
+define('WCAC_API_KEY', 'YOUR_API_CREDENTIAL');
+```
+
+When configured, this server-managed credential takes precedence over the credential stored by the plugin.
+
+Keep the value outside source control and never commit production credentials to Git.
+
+### Encryption key vs API credential
+
+These are two different secrets:
+
+```text
+WCAC_API_KEY
+    │
+    └── External API credential
+
+WCAC_ENCRYPTION_KEY
+    │
+    └── Local encryption key used to protect
+        credentials stored by the plugin
+```
+
+The encryption key does not authenticate requests to the external API.
+
+**Never place production API credentials or encryption keys in GitHub, screenshots, example configuration files, support requests, or issue reports.**
 
 ---
 
@@ -378,6 +502,9 @@ Before deploying a new version, test the plugin against a real WooCommerce insta
 - Server errors
 - Request timeouts
 - Retry scenarios
+- Encrypted credential storage and retrieval
+- Connection testing with a newly entered credential
+- Connection testing with a previously saved credential
 
 ---
 
@@ -392,10 +519,17 @@ The project follows WordPress security practices including:
 - Input sanitization
 - Output escaping
 - WordPress HTTP APIs
+- Authenticated encryption for stored API credentials
+- Dedicated encryption key configuration
 - Secure handling of API credentials
 - Avoiding direct database access for WooCommerce orders
 - Avoiding credentials in logs
 - Validation of API configuration
+- TLS certificate verification for outbound HTTP requests
+
+API credentials stored by the plugin are encrypted before being persisted to the WordPress options table.
+
+The plugin uses PHP Sodium authenticated encryption for credential protection.
 
 The plugin does not require access to the external API's source code or server infrastructure.
 
@@ -442,6 +576,7 @@ The current version focuses on the core WooCommerce → REST API integration wor
 - WooCommerce order events
 - Configurable API connection
 - API authentication
+- Encrypted API credential storage
 - Order field mapping
 - Customer information mapping
 - Line-item mapping
@@ -510,6 +645,7 @@ This approach keeps production integrations predictable while using AI to reduce
 - [x] WooCommerce integration
 - [x] REST API client
 - [x] API authentication
+- [x] Encrypted API credential storage
 - [x] Order events
 - [x] Field mapping
 - [x] Nested payloads
@@ -555,6 +691,7 @@ Before submitting a pull request:
 4. Run static analysis/linting where configured.
 5. Ensure WordPress and WooCommerce compatibility is maintained.
 6. Do not include API credentials or customer data.
+7. Do not include encryption keys or other deployment secrets.
 
 ---
 
@@ -570,7 +707,7 @@ When reporting a problem, please include:
 - Relevant error/log information
 - Steps to reproduce the issue
 
-**Never include API keys, passwords, customer information, or other sensitive data in an issue.**
+**Never include API keys, encryption keys, passwords, customer information, or other sensitive data in an issue.**
 
 ---
 
@@ -578,7 +715,7 @@ When reporting a problem, please include:
 
 This project is licensed under the GPL-2.0-or-later license.
 
-See [LICENSE](LICENSE) for details.
+See `LICENSE` for details.
 
 ---
 
