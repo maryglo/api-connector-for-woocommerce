@@ -7,11 +7,13 @@ namespace WooCommerceApiConnector\Api\Authentication;
 defined('ABSPATH') || exit;
 
 /**
- * Bearer token authentication (v0.1).
+ * Bearer token authentication.
  */
 final class BearerAuth
 {
 	/**
+	 * Build Bearer authentication headers.
+	 *
 	 * @return array<string, string>
 	 */
 	public static function headers(string $token): array
@@ -19,6 +21,19 @@ final class BearerAuth
 		$token = trim($token);
 
 		if ('' === $token) {
+			return array();
+		}
+
+		/*
+		 * Prevent HTTP header injection.
+		 *
+		 * Bearer tokens must never contain CR/LF characters because those
+		 * characters can be interpreted as HTTP header delimiters.
+		 */
+		if (
+			false !== strpos($token, "\r")
+			|| false !== strpos($token, "\n")
+		) {
 			return array();
 		}
 
