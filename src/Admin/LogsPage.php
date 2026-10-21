@@ -45,20 +45,29 @@ final class LogsPage
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach (IntegrationLogger::recent() as $log) : ?>
+				<?php
+				$logs = IntegrationLogger::recent();
+				if (array() === $logs) :
+					?>
 					<tr>
-						<td>
-							<a href="<?php echo esc_url(add_query_arg('log_id', (int) $log->id, $logs_url)); ?>">
-								<?php echo esc_html((string) $log->id); ?>
-							</a>
-						</td>
-						<td><?php echo esc_html($log->event_type); ?></td>
-						<td><?php echo esc_html($log->resource_type . ' #' . $log->resource_id); ?></td>
-						<td><?php echo esc_html($log->status); ?></td>
-						<td><?php echo esc_html((string) $log->attempts); ?></td>
-						<td><?php echo esc_html($log->updated_at); ?></td>
+						<td colspan="6"><?php esc_html_e('No integration logs yet.', Plugin::TEXT_DOMAIN); ?></td>
 					</tr>
-				<?php endforeach; ?>
+				<?php else : ?>
+					<?php foreach ($logs as $log) : ?>
+						<tr>
+							<td>
+								<a href="<?php echo esc_url(add_query_arg('log_id', (int) $log->id, $logs_url)); ?>">
+									<?php echo esc_html((string) $log->id); ?>
+								</a>
+							</td>
+							<td><?php echo esc_html($log->event_type); ?></td>
+							<td><?php echo esc_html($log->resource_type . ' #' . $log->resource_id); ?></td>
+							<td><?php echo esc_html($log->status); ?></td>
+							<td><?php echo esc_html((string) $log->attempts); ?></td>
+							<td><?php echo esc_html($log->updated_at); ?></td>
+						</tr>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</tbody>
 		</table>
 		<?php

@@ -265,7 +265,7 @@ final class SettingsPage
 								class="regular-text"
 								value=""
 								autocomplete="new-password"
-								placeholder="<?php echo Settings::has_token() ? esc_attr__('Saved — leave blank to keep', Plugin::TEXT_DOMAIN) : ''; ?>" />
+								placeholder="<?php echo Settings::has_token() ? esc_attr__('Saved - leave blank to keep', Plugin::TEXT_DOMAIN) : ''; ?>" />
 							<?php if (Settings::has_token()) : ?>
 								<p class="description"><?php echo esc_html__('A token is saved. Leave this field blank to keep it.', Plugin::TEXT_DOMAIN); ?></p>
 							<?php endif; ?>

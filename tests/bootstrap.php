@@ -25,6 +25,40 @@ final class WcacHttpTestTransport
 	);
 }
 
+final class WcacWpdb
+{
+	public string $prefix = 'wp_';
+
+	/** @var array<string, mixed> */
+	public array $last_update = array();
+
+	public int $update_result = 1;
+
+	/**
+	 * @param array<string, mixed> $data
+	 * @param array<string, mixed> $where
+	 * @param list<string>|null    $format
+	 * @param list<string>|null    $where_format
+	 */
+	public function update(
+		string $table,
+		array $data,
+		array $where,
+		?array $format = null,
+		?array $where_format = null
+	): int {
+		$this->last_update = array(
+			'table'        => $table,
+			'data'         => $data,
+			'where'        => $where,
+			'format'       => $format,
+			'where_format' => $where_format,
+		);
+
+		return $this->update_result;
+	}
+}
+
 if (! class_exists('WP_Error')) {
 	final class WP_Error
 	{
@@ -124,5 +158,19 @@ if (! function_exists('wp_remote_retrieve_body')) {
 	function wp_remote_retrieve_body(array $response): string
 	{
 		return (string) ($response['body'] ?? '');
+	}
+}
+
+if (! function_exists('wp_parse_url')) {
+	function wp_parse_url(string $url, int $component = -1): mixed
+	{
+		return parse_url($url, $component);
+	}
+}
+
+if (! function_exists('current_time')) {
+	function current_time(string $type, int|bool $gmt = 0): string
+	{
+		return '2026-01-01 00:00:00';
 	}
 }

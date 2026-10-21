@@ -164,6 +164,7 @@ final class IntegrationLogger
 			'request_url',
 			'request_body',
 			'response_status',
+			'response_code',
 			'response_body',
 			'error_message',
 		);
@@ -186,7 +187,8 @@ final class IntegrationLogger
 					break;
 
 				case 'response_status':
-					$filtered[$field] = max(0, (int) $value);
+				case 'response_code':
+					$filtered['response_code'] = max(0, (int) $value);
 					break;
 
 				case 'request_method':
@@ -549,7 +551,7 @@ final class IntegrationLogger
 		$formats = array();
 
 		foreach ($data as $key => $value) {
-			if ('attempts' === $key || 'response_status' === $key) {
+			if ('attempts' === $key || 'response_code' === $key) {
 				$formats[] = '%d';
 			} else {
 				$formats[] = '%s';

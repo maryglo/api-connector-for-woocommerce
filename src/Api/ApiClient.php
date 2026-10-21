@@ -232,6 +232,7 @@ final class ApiClient
 		return in_array(
 			$method,
 			array(
+				'HEAD',
 				'GET',
 				'POST',
 				'PUT',
@@ -281,12 +282,9 @@ final class ApiClient
 			(string) ($url_parts['scheme'] ?? '')
 		);
 
-		/*
-		 * API credentials must not be sent over plain HTTP.
-		 */
 		if (
-			'https' !== $base_scheme
-			|| 'https' !== $url_scheme
+			$base_scheme !== $url_scheme
+			|| ! in_array($base_scheme, array('http', 'https'), true)
 		) {
 			return null;
 		}
@@ -319,23 +317,71 @@ final class ApiClient
 		}
 
 		/*
-		 * Require the same port as the configured base URL.
-		 *
-		 * HTTPS defaults to 443 when no port is explicitly provided.
+		 * Credentials must not be sent over public HTTP.
+		 * Loopback, .local, and RFC1918 hosts are allowed for local Docker.
 		 */
+		if (
+			'http' === $base_scheme
+			&& ! self::is_local_or_private_host($base_host)
+		) {
+			return null;
+		}
+
+		$default_port = 'https' === $base_scheme ? 443 : 80;
+
 		$base_port = isset($base_parts['port'])
 			? (int) $base_parts['port']
-			: 443;
+			: $default_port;
 
 		$url_port = isset($url_parts['port'])
 			? (int) $url_parts['port']
-			: 443;
+			: $default_port;
 
 		if ($base_port !== $url_port) {
 			return null;
 		}
 
 		return $url;
+	}
+
+	/**
+	 * Whether a host may use HTTP (local Docker / private networks).
+	 */
+	private static function is_local_or_private_host(string $host): bool
+	{
+		if (
+			'localhost' === $host
+			|| str_ends_with($host, '.localhost')
+			|| str_ends_with($host, '.local')
+		) {
+			return true;
+		}
+
+		if (
+			str_starts_with($host, '[')
+			&& str_ends_with($host, ']')
+		) {
+			$host = substr($host, 1, -1);
+		}
+
+		if ('::1' === $host) {
+			return true;
+		}
+
+		if (false === filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+			return false;
+		}
+
+		$octets = array_map('intval', explode('.', $host));
+
+		if (4 !== count($octets)) {
+			return false;
+		}
+
+		return 127 === $octets[0]
+			|| 10 === $octets[0]
+			|| (192 === $octets[0] && 168 === $octets[1])
+			|| (172 === $octets[0] && $octets[1] >= 16 && $octets[1] <= 31);
 	}
 
 	/**
