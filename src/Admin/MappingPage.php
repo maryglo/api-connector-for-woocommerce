@@ -125,6 +125,7 @@ final class MappingPage
 		<form method="post">
 			<hr />
 			<h2><?php esc_html_e('Test Mapping', Plugin::TEXT_DOMAIN); ?></h2>
+			<p class="description"><?php esc_html_e('Preview and test send use the saved mapping, not unsaved table edits.', Plugin::TEXT_DOMAIN); ?></p>
 			<?php wp_nonce_field('wcac_mapping', 'wcac_mapping_nonce'); ?>
 			<select name="order_id">
 				<?php foreach (wc_get_orders(array('limit' => 50, 'orderby' => 'ID', 'order' => 'DESC', 'return' => 'objects')) as $order) : ?>
