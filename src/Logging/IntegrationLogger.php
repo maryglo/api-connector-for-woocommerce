@@ -76,7 +76,7 @@ final class IntegrationLogger
 
 		$now = current_time('mysql', true);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom log table is not registered with the WordPress object cache.
 		$result = $wpdb->insert(
 			$table,
 			array(
@@ -230,7 +230,7 @@ final class IntegrationLogger
 
 		$filtered['updated_at'] = current_time('mysql', true);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom log table is not registered with the WordPress object cache.
 		$result = $wpdb->update(
 			\WooCommerceApiConnector\Install\Schema::table_name(),
 			$filtered,
@@ -273,10 +273,11 @@ final class IntegrationLogger
 
 		$table = \WooCommerceApiConnector\Install\Schema::table_name();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom log table is not registered with the WordPress object cache.
 		$result = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE id = %d",
+				'SELECT * FROM %i WHERE id = %d',
+				$table,
 				$id
 			)
 		);
@@ -297,10 +298,11 @@ final class IntegrationLogger
 
 		$table = \WooCommerceApiConnector\Install\Schema::table_name();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom log table is not registered with the WordPress object cache.
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} ORDER BY id DESC LIMIT %d",
+				'SELECT * FROM %i ORDER BY id DESC LIMIT %d',
+				$table,
 				$limit
 			)
 		);
@@ -322,10 +324,11 @@ final class IntegrationLogger
 			time() - (90 * DAY_IN_SECONDS)
 		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom log table is not registered with the WordPress object cache.
 		$wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM {$table} WHERE created_at < %s",
+				'DELETE FROM %i WHERE created_at < %s',
+				$table,
 				$before
 			)
 		);

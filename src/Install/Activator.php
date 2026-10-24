@@ -25,9 +25,9 @@ final class Activator
 			wp_die(
 				esc_html__(
 					'API Connector for WooCommerce requires WooCommerce to be installed and active.',
-					Plugin::TEXT_DOMAIN
+					'api-connector-for-woocommerce'
 				),
-				esc_html__('Plugin activation failed', Plugin::TEXT_DOMAIN),
+				esc_html__('Plugin activation failed', 'api-connector-for-woocommerce'),
 				array('back_link' => true)
 			);
 		}

@@ -34,8 +34,8 @@ final class SettingsPage
 	{
 		add_submenu_page(
 			'woocommerce',
-			__('API Connector', Plugin::TEXT_DOMAIN),
-			__('API Connector', Plugin::TEXT_DOMAIN),
+			__('API Connector', 'api-connector-for-woocommerce'),
+			__('API Connector', 'api-connector-for-woocommerce'),
 			'manage_woocommerce',
 			self::MENU_SLUG,
 			array(self::class, 'render')
@@ -72,7 +72,7 @@ final class SettingsPage
 			'wcac-admin-settings',
 			'wcacAdminSettings',
 			array(
-				'confirmRemoveMappingRow' => __('Remove this mapping row?', Plugin::TEXT_DOMAIN),
+				'confirmRemoveMappingRow' => __('Remove this mapping row?', 'api-connector-for-woocommerce'),
 			)
 		);
 	}
@@ -115,7 +115,7 @@ final class SettingsPage
 		}
 
 		Settings::save($settings);
-		self::store_notice('success', __('Settings saved.', Plugin::TEXT_DOMAIN));
+		self::store_notice('success', __('Settings saved.', 'api-connector-for-woocommerce'));
 		self::redirect();
 	}
 
@@ -138,18 +138,12 @@ final class SettingsPage
 				$result['success'] ? 'success' : 'error',
 				$result['message']
 			);
-		} catch (\RuntimeException $exception) {
+		} catch (\RuntimeException) {
 			self::store_notice(
 				'error',
-				__('Unable to test the connection because the API credential configuration is incomplete.', Plugin::TEXT_DOMAIN)
+				__('Unable to test the connection because the API credential configuration is incomplete.', 'api-connector-for-woocommerce')
 			);
 
-
-			if (defined('WP_DEBUG') && WP_DEBUG) {
-				error_log(
-					'WCAC connection test failed: ' . $exception->getMessage()
-				);
-			}
 		}
 		self::redirect();
 	}
@@ -165,11 +159,11 @@ final class SettingsPage
 		self::render_notice();
 ?>
 		<div class="wrap woocommerce wcac-settings">
-			<h1><?php echo esc_html__('API Connector', Plugin::TEXT_DOMAIN); ?></h1>
+			<h1><?php echo esc_html__('API Connector', 'api-connector-for-woocommerce'); ?></h1>
 			<nav class="nav-tab-wrapper woo-nav-tab-wrapper">
-				<?php self::tab_link(self::TAB_CONNECTION, __('Connection', Plugin::TEXT_DOMAIN), $tab); ?>
-				<?php self::tab_link(self::TAB_MAPPING, __('Mapping', Plugin::TEXT_DOMAIN), $tab); ?>
-				<?php self::tab_link(self::TAB_LOGS, __('Logs', Plugin::TEXT_DOMAIN), $tab); ?>
+				<?php self::tab_link(self::TAB_CONNECTION, __('Connection', 'api-connector-for-woocommerce'), $tab); ?>
+				<?php self::tab_link(self::TAB_MAPPING, __('Mapping', 'api-connector-for-woocommerce'), $tab); ?>
+				<?php self::tab_link(self::TAB_LOGS, __('Logs', 'api-connector-for-woocommerce'), $tab); ?>
 			</nav>
 			<?php
 			if (self::TAB_MAPPING === $tab) {
@@ -191,11 +185,11 @@ final class SettingsPage
 			<form method="post" action="<?php echo esc_url(admin_url('admin.php?page=' . self::MENU_SLUG)); ?>" autocomplete="off">
 				<?php wp_nonce_field('wcac_settings_save', 'wcac_settings_nonce'); ?>
 
-				<h2><?php echo esc_html__('Connection', Plugin::TEXT_DOMAIN); ?></h2>
+				<h2><?php echo esc_html__('Connection', 'api-connector-for-woocommerce'); ?></h2>
 				<table class="form-table" role="presentation">
 					<tr>
 						<th scope="row">
-							<label for="wcac_api_name"><?php echo esc_html__('API Name', Plugin::TEXT_DOMAIN); ?></label>
+							<label for="wcac_api_name"><?php echo esc_html__('API Name', 'api-connector-for-woocommerce'); ?></label>
 						</th>
 						<td>
 							<input
@@ -205,12 +199,12 @@ final class SettingsPage
 								class="regular-text"
 								value="<?php echo esc_attr((string) $settings['api_name']); ?>"
 								required />
-							<p class="description"><?php echo esc_html__('Label used in the admin UI and logs.', Plugin::TEXT_DOMAIN); ?></p>
+							<p class="description"><?php echo esc_html__('Label used in the admin UI and logs.', 'api-connector-for-woocommerce'); ?></p>
 						</td>
 					</tr>
 					<tr>
 						<th scope="row">
-							<label for="wcac_base_url"><?php echo esc_html__('Base URL', Plugin::TEXT_DOMAIN); ?></label>
+							<label for="wcac_base_url"><?php echo esc_html__('Base URL', 'api-connector-for-woocommerce'); ?></label>
 						</th>
 						<td>
 							<input
@@ -225,7 +219,7 @@ final class SettingsPage
 					</tr>
 					<tr>
 						<th scope="row">
-							<label for="wcac_health_path"><?php echo esc_html__('Health path', Plugin::TEXT_DOMAIN); ?></label>
+							<label for="wcac_health_path"><?php echo esc_html__('Health path', 'api-connector-for-woocommerce'); ?></label>
 						</th>
 						<td>
 							<input
@@ -233,29 +227,29 @@ final class SettingsPage
 								id="wcac_health_path"
 								type="text"
 								class="regular-text"
-								placeholder="<?php echo esc_attr__('/ (base URL)', Plugin::TEXT_DOMAIN); ?>"
+								placeholder="<?php echo esc_attr__('/ (base URL)', 'api-connector-for-woocommerce'); ?>"
 								value="<?php echo esc_attr((string) $settings['health_path']); ?>" />
-							<p class="description"><?php echo esc_html__('Optional path for Test Connection. Leave empty to request the base URL.', Plugin::TEXT_DOMAIN); ?></p>
+							<p class="description"><?php echo esc_html__('Optional path for Test Connection. Leave empty to request the base URL.', 'api-connector-for-woocommerce'); ?></p>
 						</td>
 					</tr>
 					<tr>
 						<th scope="row">
-							<label for="wcac_auth_method"><?php echo esc_html__('Authentication', Plugin::TEXT_DOMAIN); ?></label>
+							<label for="wcac_auth_method"><?php echo esc_html__('Authentication', 'api-connector-for-woocommerce'); ?></label>
 						</th>
 						<td>
 							<select name="wcac_settings[auth_method]" id="wcac_auth_method">
 								<option value="<?php echo esc_attr(Sanitizer::AUTH_BEARER); ?>" <?php selected($settings['auth_method'], Sanitizer::AUTH_BEARER); ?>>
-									<?php echo esc_html__('Bearer Token', Plugin::TEXT_DOMAIN); ?>
+									<?php echo esc_html__('Bearer Token', 'api-connector-for-woocommerce'); ?>
 								</option>
 								<option value="<?php echo esc_attr(Sanitizer::AUTH_API_KEY); ?>" <?php selected($settings['auth_method'], Sanitizer::AUTH_API_KEY); ?>>
-									<?php echo esc_html__('API Key', Plugin::TEXT_DOMAIN); ?>
+									<?php echo esc_html__('API Key', 'api-connector-for-woocommerce'); ?>
 								</option>
 							</select>
 						</td>
 					</tr>
 					<tr>
 						<th scope="row">
-							<label for="wcac_token"><?php echo esc_html__('API Key / Token', Plugin::TEXT_DOMAIN); ?></label>
+							<label for="wcac_token"><?php echo esc_html__('API Key / Token', 'api-connector-for-woocommerce'); ?></label>
 						</th>
 						<td>
 							<input
@@ -265,15 +259,15 @@ final class SettingsPage
 								class="regular-text"
 								value=""
 								autocomplete="new-password"
-								placeholder="<?php echo Settings::has_token() ? esc_attr__('Saved - leave blank to keep', Plugin::TEXT_DOMAIN) : ''; ?>" />
+								placeholder="<?php echo Settings::has_token() ? esc_attr__('Saved - leave blank to keep', 'api-connector-for-woocommerce') : ''; ?>" />
 							<?php if (Settings::has_token()) : ?>
-								<p class="description"><?php echo esc_html__('A token is saved. Leave this field blank to keep it.', Plugin::TEXT_DOMAIN); ?></p>
+								<p class="description"><?php echo esc_html__('A token is saved. Leave this field blank to keep it.', 'api-connector-for-woocommerce'); ?></p>
 							<?php endif; ?>
 						</td>
 					</tr>
 					<tr class="wcac-api-key-header" <?php echo $is_api_key ? '' : 'hidden'; ?>>
 						<th scope="row">
-							<label for="wcac_api_key_header"><?php echo esc_html__('API key header', Plugin::TEXT_DOMAIN); ?></label>
+							<label for="wcac_api_key_header"><?php echo esc_html__('API key header', 'api-connector-for-woocommerce'); ?></label>
 						</th>
 						<td>
 							<input
@@ -282,71 +276,71 @@ final class SettingsPage
 								type="text"
 								class="regular-text"
 								value="<?php echo esc_attr((string) $settings['api_key_header']); ?>" />
-							<p class="description"><?php echo esc_html__('HTTP header that carries the API key. Default: X-API-Key.', Plugin::TEXT_DOMAIN); ?></p>
+							<p class="description"><?php echo esc_html__('HTTP header that carries the API key. Default: X-API-Key.', 'api-connector-for-woocommerce'); ?></p>
 						</td>
 					</tr>
 				</table>
 
 				<p>
 					<button type="submit" name="wcac_test_connection" class="button" value="1">
-						<?php echo esc_html__('Test Connection', Plugin::TEXT_DOMAIN); ?>
+						<?php echo esc_html__('Test Connection', 'api-connector-for-woocommerce'); ?>
 					</button>
 				</p>
 
-				<h2><?php echo esc_html__('Events', Plugin::TEXT_DOMAIN); ?></h2>
+				<h2><?php echo esc_html__('Events', 'api-connector-for-woocommerce'); ?></h2>
 				<table class="form-table" role="presentation">
 					<tr>
-						<th scope="row"><?php echo esc_html__('Orders', Plugin::TEXT_DOMAIN); ?></th>
+						<th scope="row"><?php echo esc_html__('Orders', 'api-connector-for-woocommerce'); ?></th>
 						<td>
 							<fieldset>
 								<label>
 									<input type="checkbox" name="wcac_settings[events][order_created]" value="1" <?php checked($order_created); ?> />
-									<?php echo esc_html__('Send order when created', Plugin::TEXT_DOMAIN); ?>
+									<?php echo esc_html__('Send order when created', 'api-connector-for-woocommerce'); ?>
 								</label>
 								<br />
 								<label>
 									<input type="checkbox" name="wcac_settings[events][order_completed]" value="1" <?php checked($order_completed); ?> />
-									<?php echo esc_html__('Send order when completed', Plugin::TEXT_DOMAIN); ?>
+									<?php echo esc_html__('Send order when completed', 'api-connector-for-woocommerce'); ?>
 								</label>
 							</fieldset>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><?php echo esc_html__('Customers', Plugin::TEXT_DOMAIN); ?></th>
+						<th scope="row"><?php echo esc_html__('Customers', 'api-connector-for-woocommerce'); ?></th>
 						<td>
 							<fieldset>
 								<label>
 									<input type="checkbox" disabled />
-									<?php echo esc_html__('Send customer when created', Plugin::TEXT_DOMAIN); ?>
+									<?php echo esc_html__('Send customer when created', 'api-connector-for-woocommerce'); ?>
 								</label>
-								<p class="description"><?php echo esc_html__('Coming in v0.2.', Plugin::TEXT_DOMAIN); ?></p>
+								<p class="description"><?php echo esc_html__('Coming in v0.2.', 'api-connector-for-woocommerce'); ?></p>
 							</fieldset>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><?php echo esc_html__('Products', Plugin::TEXT_DOMAIN); ?></th>
+						<th scope="row"><?php echo esc_html__('Products', 'api-connector-for-woocommerce'); ?></th>
 						<td>
 							<fieldset>
 								<label>
 									<input type="checkbox" disabled />
-									<?php echo esc_html__('Send product when created', Plugin::TEXT_DOMAIN); ?>
+									<?php echo esc_html__('Send product when created', 'api-connector-for-woocommerce'); ?>
 								</label>
 								<br />
 								<label>
 									<input type="checkbox" disabled />
-									<?php echo esc_html__('Send product when updated', Plugin::TEXT_DOMAIN); ?>
+									<?php echo esc_html__('Send product when updated', 'api-connector-for-woocommerce'); ?>
 								</label>
-								<p class="description"><?php echo esc_html__('Coming in v0.2.', Plugin::TEXT_DOMAIN); ?></p>
+								<p class="description"><?php echo esc_html__('Coming in v0.2.', 'api-connector-for-woocommerce'); ?></p>
 							</fieldset>
 						</td>
 					</tr>
 				</table>
 
-				<h2><?php echo esc_html__('Endpoints', Plugin::TEXT_DOMAIN); ?></h2>
+				<h2><?php echo esc_html__('Endpoints', 'api-connector-for-woocommerce'); ?></h2>
 				<table class="form-table" role="presentation">
 					<tr>
 						<th scope="row">
-							<label for="wcac_order_endpoint"><?php echo esc_html__('Order Endpoint', Plugin::TEXT_DOMAIN); ?></label>
+							<label for="wcac_order_endpoint"><?php echo esc_html__('Order Endpoint', 'api-connector-for-woocommerce'); ?></label>
 						</th>
 						<td>
 							<code class="wcac-http-method">POST</code>
@@ -356,12 +350,12 @@ final class SettingsPage
 								type="text"
 								class="regular-text"
 								value="<?php echo esc_attr((string) $settings['order_endpoint']); ?>" />
-							<p class="description"><?php echo esc_html__('Path relative to the base URL.', Plugin::TEXT_DOMAIN); ?></p>
+							<p class="description"><?php echo esc_html__('Path relative to the base URL.', 'api-connector-for-woocommerce'); ?></p>
 						</td>
 					</tr>
 					<tr>
 						<th scope="row">
-							<label for="wcac_customer_endpoint"><?php echo esc_html__('Customer Endpoint', Plugin::TEXT_DOMAIN); ?></label>
+							<label for="wcac_customer_endpoint"><?php echo esc_html__('Customer Endpoint', 'api-connector-for-woocommerce'); ?></label>
 						</th>
 						<td>
 							<code class="wcac-http-method">POST</code>
@@ -371,14 +365,14 @@ final class SettingsPage
 								type="text"
 								class="regular-text"
 								value="<?php echo esc_attr((string) $settings['customer_endpoint']); ?>" />
-							<p class="description"><?php echo esc_html__('Stored for v0.2 customer events. Path relative to the base URL.', Plugin::TEXT_DOMAIN); ?></p>
+							<p class="description"><?php echo esc_html__('Stored for v0.2 customer events. Path relative to the base URL.', 'api-connector-for-woocommerce'); ?></p>
 						</td>
 					</tr>
 				</table>
 
 				<p class="submit">
 					<button type="submit" name="wcac_save_settings" class="button-primary" value="1">
-						<?php echo esc_html__('Save changes', Plugin::TEXT_DOMAIN); ?>
+						<?php echo esc_html__('Save changes', 'api-connector-for-woocommerce'); ?>
 					</button>
 				</p>
 			</form>
@@ -417,6 +411,7 @@ final class SettingsPage
 
 	private static function active_tab(): string
 	{
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This read-only tab selector performs no state changes.
 		$tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : self::TAB_CONNECTION;
 
 		return in_array($tab, array(self::TAB_CONNECTION, self::TAB_MAPPING, self::TAB_LOGS), true)

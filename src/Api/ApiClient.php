@@ -57,7 +57,7 @@ final class ApiClient
 				0,
 				'',
 				array(),
-				__('HTTP method is not allowed.', 'woocommerce-api-connector')
+				__('HTTP method is not allowed.', 'api-connector-for-woocommerce')
 			);
 		}
 
@@ -68,7 +68,7 @@ final class ApiClient
 				0,
 				'',
 				array(),
-				__('The API URL is invalid or not allowed.', 'woocommerce-api-connector')
+				__('The API URL is invalid or not allowed.', 'api-connector-for-woocommerce')
 			);
 		}
 
@@ -88,7 +88,7 @@ final class ApiClient
 					0,
 					'',
 					array(),
-					__('Unable to encode the request body as JSON.', 'woocommerce-api-connector')
+					__('Unable to encode the request body as JSON.', 'api-connector-for-woocommerce')
 				);
 			}
 
@@ -111,7 +111,7 @@ final class ApiClient
 				0,
 				'',
 				array(),
-				__('Unable to connect to the configured API.', 'woocommerce-api-connector')
+				__('Unable to connect to the configured API.', 'api-connector-for-woocommerce')
 			);
 		}
 

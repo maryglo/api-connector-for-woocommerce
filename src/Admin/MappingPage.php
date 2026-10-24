@@ -8,7 +8,6 @@ use WooCommerceApiConnector\Jobs\SendIntegrationJob;
 use WooCommerceApiConnector\Logging\IntegrationLogger;
 use WooCommerceApiConnector\Mapping\MappingEngine;
 use WooCommerceApiConnector\Mapping\MappingValidator;
-use WooCommerceApiConnector\Plugin;
 use WooCommerceApiConnector\Settings\Settings;
 
 defined('ABSPATH') || exit;
@@ -49,7 +48,7 @@ final class MappingPage
 				$settings            = Settings::get();
 				$settings['mapping'] = $rows;
 				Settings::save($settings);
-				self::notice('success', __('Mapping saved.', Plugin::TEXT_DOMAIN));
+				self::notice('success', __('Mapping saved.', 'api-connector-for-woocommerce'));
 			}
 
 			self::redirect();
@@ -59,14 +58,14 @@ final class MappingPage
 		$order    = wc_get_order($order_id);
 
 		if (! $order) {
-			self::notice('error', __('Choose a valid order.', Plugin::TEXT_DOMAIN));
+			self::notice('error', __('Choose a valid order.', 'api-connector-for-woocommerce'));
 			self::redirect();
 		}
 
 		if ('send' === $action) {
 			$log_id = IntegrationLogger::create('order.test', 'order', $order_id, true);
 			SendIntegrationJob::enqueue($log_id, $order_id, 'order.test', true);
-			self::notice('success', __('Test request queued. View its result in Logs.', Plugin::TEXT_DOMAIN));
+			self::notice('success', __('Test request queued. View its result in Logs.', 'api-connector-for-woocommerce'));
 			self::redirect();
 		}
 
@@ -97,14 +96,14 @@ final class MappingPage
 		<?php self::render_notice(); ?>
 		<form method="post">
 			<?php wp_nonce_field('wcac_mapping', 'wcac_mapping_nonce'); ?>
-			<h2><?php esc_html_e('Order Mapping', Plugin::TEXT_DOMAIN); ?></h2>
-			<p><?php esc_html_e('Use dot paths for nested values and items[].field for order line items.', Plugin::TEXT_DOMAIN); ?></p>
+			<h2><?php esc_html_e('Order Mapping', 'api-connector-for-woocommerce'); ?></h2>
+			<p><?php esc_html_e('Use dot paths for nested values and items[].field for order line items.', 'api-connector-for-woocommerce'); ?></p>
 			<table class="widefat wcac-mapping-table">
 				<thead>
 					<tr>
-						<th><?php esc_html_e('WooCommerce field', Plugin::TEXT_DOMAIN); ?></th>
-						<th><?php esc_html_e('API field', Plugin::TEXT_DOMAIN); ?></th>
-						<th><?php esc_html_e('Actions', Plugin::TEXT_DOMAIN); ?></th>
+						<th><?php esc_html_e('WooCommerce field', 'api-connector-for-woocommerce'); ?></th>
+						<th><?php esc_html_e('API field', 'api-connector-for-woocommerce'); ?></th>
+						<th><?php esc_html_e('Actions', 'api-connector-for-woocommerce'); ?></th>
 					</tr>
 				</thead>
 				<tbody id="wcac-mapping-rows">
@@ -114,9 +113,9 @@ final class MappingPage
 				</tbody>
 			</table>
 			<p>
-				<button type="button" class="button" id="wcac-add-mapping-row"><?php esc_html_e('Add row', Plugin::TEXT_DOMAIN); ?></button>
-				<noscript><button class="button" name="wcac_mapping_action" value="add_row"><?php esc_html_e('Add row', Plugin::TEXT_DOMAIN); ?></button></noscript>
-				<button class="button button-primary" name="wcac_mapping_action" value="save"><?php esc_html_e('Save mapping', Plugin::TEXT_DOMAIN); ?></button>
+				<button type="button" class="button" id="wcac-add-mapping-row"><?php esc_html_e('Add row', 'api-connector-for-woocommerce'); ?></button>
+				<noscript><button class="button" name="wcac_mapping_action" value="add_row"><?php esc_html_e('Add row', 'api-connector-for-woocommerce'); ?></button></noscript>
+				<button class="button button-primary" name="wcac_mapping_action" value="save"><?php esc_html_e('Save mapping', 'api-connector-for-woocommerce'); ?></button>
 			</p>
 		</form>
 		<template id="wcac-mapping-row-template">
@@ -124,19 +123,19 @@ final class MappingPage
 		</template>
 		<form method="post">
 			<hr />
-			<h2><?php esc_html_e('Test Mapping', Plugin::TEXT_DOMAIN); ?></h2>
-			<p class="description"><?php esc_html_e('Preview and test send use the saved mapping, not unsaved table edits.', Plugin::TEXT_DOMAIN); ?></p>
+			<h2><?php esc_html_e('Test Mapping', 'api-connector-for-woocommerce'); ?></h2>
+			<p class="description"><?php esc_html_e('Preview and test send use the saved mapping, not unsaved table edits.', 'api-connector-for-woocommerce'); ?></p>
 			<?php wp_nonce_field('wcac_mapping', 'wcac_mapping_nonce'); ?>
 			<select name="order_id">
 				<?php foreach (wc_get_orders(array('limit' => 50, 'orderby' => 'ID', 'order' => 'DESC', 'return' => 'objects')) as $order) : ?>
 					<option value="<?php echo esc_attr((string) $order->get_id()); ?>">#<?php echo esc_html($order->get_order_number()); ?></option>
 				<?php endforeach; ?>
 			</select>
-			<button class="button" name="wcac_mapping_action" value="preview"><?php esc_html_e('Test Mapping', Plugin::TEXT_DOMAIN); ?></button>
-			<button class="button" name="wcac_mapping_action" value="send"><?php esc_html_e('Send Test Request', Plugin::TEXT_DOMAIN); ?></button>
+			<button class="button" name="wcac_mapping_action" value="preview"><?php esc_html_e('Test Mapping', 'api-connector-for-woocommerce'); ?></button>
+			<button class="button" name="wcac_mapping_action" value="send"><?php esc_html_e('Send Test Request', 'api-connector-for-woocommerce'); ?></button>
 		</form>
 		<?php if (is_string($payload)) : ?>
-			<h2><?php esc_html_e('Generated Payload', Plugin::TEXT_DOMAIN); ?></h2>
+			<h2><?php esc_html_e('Generated Payload', 'api-connector-for-woocommerce'); ?></h2>
 			<pre style="background-color: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; overflow-x: auto;"><code><?php echo esc_html($payload); ?></code></pre>
 		<?php endif; ?>
 		<?php
@@ -161,7 +160,7 @@ final class MappingPage
 				/>
 			</td>
 			<td>
-				<button type="button" class="button wcac-remove-mapping-row"><?php esc_html_e('Remove', Plugin::TEXT_DOMAIN); ?></button>
+				<button type="button" class="button wcac-remove-mapping-row"><?php esc_html_e('Remove', 'api-connector-for-woocommerce'); ?></button>
 			</td>
 		</tr>
 		<?php
@@ -198,27 +197,27 @@ final class MappingPage
 	private static function source_options(string $selected): void
 	{
 		foreach (array(
-			'order_id'            => 'Order ID',
-			'order_number'        => 'Order number',
-			'status'              => 'Status',
-			'currency'           => 'Currency',
-			'total'               => 'Total',
-			'date_created'        => 'Date created',
-			'billing_first_name'  => 'Billing first name',
-			'billing_last_name'   => 'Billing last name',
-			'billing_email'       => 'Billing email',
-			'billing_phone'       => 'Billing phone',
-			'item_product_id'    => 'Item product ID',
-			'item_sku'            => 'Item SKU',
-			'item_name'           => 'Item name',
-			'item_quantity'       => 'Item quantity',
-			'item_subtotal'       => 'Item subtotal',
+			'order_id'            => __('Order ID', 'api-connector-for-woocommerce'),
+			'order_number'        => __('Order number', 'api-connector-for-woocommerce'),
+			'status'              => __('Status', 'api-connector-for-woocommerce'),
+			'currency'            => __('Currency', 'api-connector-for-woocommerce'),
+			'total'               => __('Total', 'api-connector-for-woocommerce'),
+			'date_created'        => __('Date created', 'api-connector-for-woocommerce'),
+			'billing_first_name'  => __('Billing first name', 'api-connector-for-woocommerce'),
+			'billing_last_name'   => __('Billing last name', 'api-connector-for-woocommerce'),
+			'billing_email'       => __('Billing email', 'api-connector-for-woocommerce'),
+			'billing_phone'       => __('Billing phone', 'api-connector-for-woocommerce'),
+			'item_product_id'     => __('Item product ID', 'api-connector-for-woocommerce'),
+			'item_sku'             => __('Item SKU', 'api-connector-for-woocommerce'),
+			'item_name'            => __('Item name', 'api-connector-for-woocommerce'),
+			'item_quantity'        => __('Item quantity', 'api-connector-for-woocommerce'),
+			'item_subtotal'        => __('Item subtotal', 'api-connector-for-woocommerce'),
 		) as $value => $label) {
 			printf(
 				'<option value="%s" %s>%s</option>',
 				esc_attr($value),
 				selected($selected, $value, false),
-				esc_html__($label, Plugin::TEXT_DOMAIN)
+				esc_html($label)
 			);
 		}
 	}

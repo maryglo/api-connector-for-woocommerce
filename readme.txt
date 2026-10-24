@@ -151,7 +151,7 @@ The integration is intentionally separated into independent components so the AP
 Clone the repository:
 
 ```bash
-git clone https://github.com/maryglo/woocommerce-integration-connector.git
+git clone https://github.com/maryglo/api-connector-for-woocommerce.git
 ```
 
 Install PHP dependencies:
@@ -163,7 +163,7 @@ composer install
 Copy the plugin into your WordPress installation:
 
 ```text
-wp-content/plugins/woocommerce-integration-connector/
+wp-content/plugins/api-connector-for-woocommerce/
 ```
 
 Then activate it from:
@@ -541,7 +541,7 @@ The plugin does not require access to the external API's source code or server i
 == Project Structure ==
 
 ```text
-woocommerce-integration-connector/
+api-connector-for-woocommerce/
 │
 ├── src/
 │   ├── Admin/
@@ -563,7 +563,7 @@ woocommerce-integration-connector/
 ├── composer.lock
 ├── readme.txt
 ├── uninstall.php
-└── woocommerce-integration-connector.php
+└── woocommerce-api-connector.php
 ```
 
 The project uses a modular architecture to keep WordPress-specific functionality separate from API communication and mapping logic.

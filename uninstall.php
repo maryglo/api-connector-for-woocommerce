@@ -9,6 +9,7 @@
 
 declare(strict_types=1);
 
+defined('ABSPATH') || exit;
 defined('WP_UNINSTALL_PLUGIN') || exit;
 
 $wcac_autoload = __DIR__ . '/vendor/autoload.php';
@@ -24,9 +25,9 @@ if (is_readable($wcac_autoload)) {
 
 global $wpdb;
 
-$table = $wpdb->prefix . 'wcac_integration_logs';
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-$wpdb->query("DROP TABLE IF EXISTS {$table}");
+$wcac_table = $wpdb->prefix . 'wcac_integration_logs';
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.NoCaching -- Required to remove the plugin's custom table.
+$wpdb->query($wpdb->prepare('DROP TABLE IF EXISTS %i', $wcac_table));
 
 delete_option('wcac_settings');
 delete_option('wcac_db_version');

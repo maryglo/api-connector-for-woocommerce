@@ -20,9 +20,9 @@ final class Plugin
 {
 	public const VERSION = '0.1.1';
 
-	public const SLUG = 'woocommerce-api-connector';
+	public const SLUG = 'api-connector-for-woocommerce';
 
-	public const TEXT_DOMAIN = 'woocommerce-api-connector';
+	public const TEXT_DOMAIN = 'api-connector-for-woocommerce';
 
 	public const OPTION_SETTINGS = 'wcac_settings';
 
@@ -68,12 +68,6 @@ final class Plugin
 
 	public function on_plugins_loaded(): void
 	{
-		load_plugin_textdomain(
-			self::TEXT_DOMAIN,
-			false,
-			dirname(plugin_basename(WCAC_FILE)) . '/languages'
-		);
-
 		if (! self::is_woocommerce_active()) {
 			add_action('admin_notices', array($this, 'woocommerce_missing_notice'));
 
@@ -114,7 +108,7 @@ final class Plugin
 		echo '<div class="notice notice-error"><p>';
 		echo esc_html__(
 			'API Connector for WooCommerce requires WooCommerce to be installed and active.',
-			self::TEXT_DOMAIN
+			'api-connector-for-woocommerce'
 		);
 		echo '</p></div>';
 	}
