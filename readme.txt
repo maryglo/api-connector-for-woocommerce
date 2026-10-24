@@ -1,17 +1,20 @@
-=== WooCommerce Integration Connector ===
-Contributors: woocommerce-api-connector
-Tags: woocommerce, rest-api, integration, orders
+=== API Connector for WooCommerce ===
+Contributors: glowkazaf
+Donate link: https://paypal.me/mgdelapedra
+Tags: woocommerce, rest-api, api, integration, orders
 Requires at least: 6.4
-Tested with woocommerce: 11.1.0
+Tested up to: 7.1
 Requires PHP: 8.1
 Requires Plugins: woocommerce
 Stable tag: 0.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-# WooCommerce Integration Connector
+Connect store orders to external REST APIs with configurable authentication, field mapping, retries, and request logs.
 
-A lightweight, configurable WooCommerce plugin for connecting WooCommerce stores to external REST APIs.
+== Description ==
+
+A lightweight, configurable plugin for connecting woocommerce online stores to external REST APIs.
 
 The plugin allows store owners and developers to send WooCommerce order data to third-party APIs without hard-coding a custom integration for every SaaS platform.
 
@@ -19,9 +22,9 @@ Configure the API connection, authentication, events, and field mappings directl
 
 ---
 
-## ✨ Features
+== Features ==
 
-### WooCommerce Integration
+=== WooCommerce Integration ===
 
 - Connect WooCommerce to any REST API endpoint
 - Support configurable API base URLs
@@ -29,7 +32,7 @@ Configure the API connection, authentication, events, and field mappings directl
 - API key authentication
 - Test API connectivity from the WordPress admin
 
-### Order Events
+=== Order Events ===
 
 - Detect newly created WooCommerce orders
 - Detect completed orders
@@ -37,7 +40,7 @@ Configure the API connection, authentication, events, and field mappings directl
 - Queue requests using Action Scheduler
 - Automatic retry handling for failed requests
 
-### Flexible Field Mapping
+=== Flexible Field Mapping ===
 
 Map WooCommerce order data to the structure required by your external API.
 
@@ -73,7 +76,7 @@ items[].quantity
 items[].price
 ```
 
-### Integration Logging
+=== Integration Logging ===
 
 Track integration requests and their results, including:
 
@@ -85,7 +88,7 @@ Track integration requests and their results, including:
 
 Sensitive authentication credentials are not included in integration logs.
 
-### Testing Tools
+=== Testing Tools ===
 
 Test the integration before sending real order data.
 
@@ -95,7 +98,7 @@ Test the integration before sending real order data.
 - Send test requests
 - Review API responses
 
-### WooCommerce HPOS
+=== High-Performance Order Storage ===
 
 The plugin is designed to work with WooCommerce High-Performance Order Storage (HPOS).
 
@@ -103,7 +106,7 @@ Orders are accessed through WooCommerce's order APIs rather than directly queryi
 
 ---
 
-## 🏗️ Architecture
+== Architecture ==
 
 The plugin follows a simple integration pipeline:
 
@@ -141,9 +144,9 @@ The integration is intentionally separated into independent components so the AP
 
 ---
 
-## 📦 Installation
+== Installation ==
 
-### From GitHub
+=== From GitHub ===
 
 Clone the repository:
 
@@ -169,18 +172,18 @@ Then activate it from:
 WordPress Admin
 → Plugins
 → Installed Plugins
-→ WooCommerce Integration Connector
+→ API Connector for WooCommerce
 ```
 
-## Requirements
+== Requirements ==
 
-- WordPress 7.1
+- WordPress 6.4 or newer
 - WooCommerce 11.1.0
 - PHP 8.1 or newer
 - PHP Sodium extension
 - HTTPS recommended for production API communication
 
-### Compatibility
+=== Compatibility ===
 
 This plugin is currently developed and tested with:
 
@@ -189,9 +192,9 @@ This plugin is currently developed and tested with:
 - **PHP:** 8.1+
 - **WooCommerce HPOS:** Supported
 
-Newer patch releases such as WordPress 7.1.1 and WooCommerce 11.1.1 should be tested before being listed as verified compatibility.
+Test the plugin in a staging environment before deploying it to a production store.
 
-## ⚙️ Configuration
+== Configuration ==
 
 After activating the plugin, open:
 
@@ -228,7 +231,7 @@ Field Mapping
 
 Save the configuration and use the built-in connection test to verify communication with the external API.
 
-### Required encryption key
+=== Required encryption key ===
 
 Before saving API credentials, configure a dedicated encryption key in `wp-config.php`.
 
@@ -258,7 +261,7 @@ Place the constant before:
 /* That's all, stop editing! Happy publishing. */
 ```
 
-### Docker environments
+=== Docker environments ===
 
 If WordPress is running in Docker, the key can be generated inside the WordPress container:
 
@@ -284,7 +287,7 @@ if (getenv('WCAC_ENCRYPTION_KEY')) {
 
 Do not commit `.env` files containing the encryption key to source control.
 
-### Encryption key requirements
+=== Encryption key requirements ===
 
 - The key must be a valid Base64-encoded 32-byte value.
 - Keep the encryption key secret.
@@ -299,11 +302,11 @@ After configuring the encryption key, enter the API credential in the API Connec
 
 ---
 
-## 🔐 Authentication
+== Authentication ==
 
 The connector supports configurable API authentication.
 
-### Bearer Token
+=== Bearer Token ===
 
 Example:
 
@@ -311,7 +314,7 @@ Example:
 Authorization: Bearer YOUR_TOKEN
 ```
 
-### API Key
+=== API Key ===
 
 Example:
 
@@ -325,7 +328,7 @@ Credentials are not rendered back into the settings form after being saved. The 
 
 When testing a connection, an administrator can enter a new credential and test it without first saving it.
 
-### Server-managed API credential
+=== Server-managed API credential ===
 
 For high-security deployments, an API credential can also be provided through the `WCAC_API_KEY` constant in `wp-config.php`.
 
@@ -339,7 +342,7 @@ When configured, this server-managed credential takes precedence over the creden
 
 Keep the value outside source control and never commit production credentials to Git.
 
-### Encryption key vs API credential
+=== Encryption key vs API credential ===
 
 These are two different secrets:
 
@@ -360,7 +363,7 @@ The encryption key does not authenticate requests to the external API.
 
 ---
 
-## 🔄 Order Processing
+== Order Processing ==
 
 When a configured WooCommerce event occurs, the plugin creates an asynchronous integration job.
 
@@ -400,7 +403,7 @@ Using asynchronous processing prevents the external API request from unnecessari
 
 ---
 
-## 🔁 Retry Handling
+== Retry Handling ==
 
 Temporary API failures can occur because of:
 
@@ -436,7 +439,7 @@ Attempt 3
 
 ---
 
-## 🧩 Field Mapping
+== Field Mapping ==
 
 The mapping system separates WooCommerce data from the external API's payload structure.
 
@@ -474,7 +477,7 @@ This means the plugin can support different API payload structures without requi
 
 ---
 
-## 🧪 Testing
+== Testing ==
 
 The project includes automated tests for core components.
 
@@ -508,7 +511,7 @@ Before deploying a new version, test the plugin against a real WooCommerce insta
 
 ---
 
-## 🛡️ Security
+== Security ==
 
 Security is an important part of the plugin architecture.
 
@@ -535,7 +538,7 @@ The plugin does not require access to the external API's source code or server i
 
 ---
 
-## 🧱 Project Structure
+== Project Structure ==
 
 ```text
 woocommerce-integration-connector/
@@ -567,11 +570,11 @@ The project uses a modular architecture to keep WordPress-specific functionality
 
 ---
 
-## 🚧 Current Scope
+== Current Scope ==
 
 The current version focuses on the core WooCommerce → REST API integration workflow.
 
-### Currently supported
+=== Currently supported ===
 
 - WooCommerce order events
 - Configurable API connection
@@ -588,7 +591,7 @@ The current version focuses on the core WooCommerce → REST API integration wor
 - Test payload generation
 - HPOS compatibility
 
-### Planned
+=== Planned ===
 
 The following features may be introduced in future releases:
 
@@ -607,7 +610,7 @@ The following features may be introduced in future releases:
 
 ---
 
-## 🤖 Future AI Integration
+== Future AI Integration ==
 
 AI is intentionally not required for the core integration process.
 
@@ -638,9 +641,9 @@ This approach keeps production integrations predictable while using AI to reduce
 
 ---
 
-## 🗺️ Roadmap
+== Roadmap ==
 
-### V1
+=== V1 ===
 
 - [x] WooCommerce integration
 - [x] REST API client
@@ -656,7 +659,7 @@ This approach keeps production integrations predictable while using AI to reduce
 - [x] Test connection
 - [x] Test payload
 
-### V1.x
+=== V1.x ===
 
 - [ ] Improved mapping UI
 - [ ] Idempotency protection
@@ -665,7 +668,7 @@ This approach keeps production integrations predictable while using AI to reduce
 - [ ] Improved integration monitoring
 - [ ] Additional automated tests
 
-### V2+
+=== V2+ ===
 
 - [ ] Product synchronization
 - [ ] Customer synchronization
@@ -679,7 +682,7 @@ This approach keeps production integrations predictable while using AI to reduce
 
 ---
 
-## 🤝 Contributing
+== Contributing ==
 
 Contributions, bug reports, feature requests, and improvements are welcome.
 
@@ -695,7 +698,7 @@ Before submitting a pull request:
 
 ---
 
-## 🐛 Bug Reports
+== Bug Reports ==
 
 When reporting a problem, please include:
 
@@ -711,7 +714,7 @@ When reporting a problem, please include:
 
 ---
 
-## 📄 License
+== License ==
 
 This project is licensed under the GPL-2.0-or-later license.
 
@@ -719,7 +722,7 @@ See `LICENSE` for details.
 
 ---
 
-## ⚠️ Disclaimer
+== Disclaimer ==
 
 This plugin is provided as an integration framework for connecting WooCommerce stores with external REST APIs.
 
@@ -729,8 +732,48 @@ Always test an integration in a staging environment before using it with product
 
 ---
 
-## ⭐ Project
+== Project ==
 
 If this project is useful to you, consider giving it a star on GitHub.
 
 Issues and feature requests are welcome.
+
+== Screenshots ==
+
+1. Configure the API connection, authentication method, and order event settings.
+2. Map order fields to nested API fields and line-item arrays.
+3. Review the full order mapping table and save the field mappings.
+4. Preview the JSON payload generated from the saved mapping.
+5. Review integration logs, request statuses, and attempt counts.
+
+== Frequently Asked Questions ==
+
+= Can this connect to any REST API? =
+
+The plugin can send order data to REST APIs that accept JSON requests. Configure the API URL, authentication, endpoints, and field mappings to match the destination API.
+
+= Can I create nested objects and line-item arrays? =
+
+Yes. Use dot paths such as `customer.email` for nested objects and `items[].sku` for line-item arrays.
+
+= Does the mapping preview use unsaved edits? =
+
+No. Preview and test send use the saved mapping. Save the mapping table before previewing if you want to test recent changes.
+
+= How are API credentials stored? =
+
+Credentials are encrypted in the WordPress database using PHP Sodium. Configure `WCAC_ENCRYPTION_KEY` before saving credentials, and keep a secure backup of that key.
+
+== Changelog ==
+
+= 0.1.1 =
+
+* Added configurable REST API connections and authentication.
+* Added order events, field mapping, asynchronous delivery, retries, and integration logs.
+* Added connection and payload testing tools.
+
+== Upgrade Notice ==
+
+= 0.1.1 =
+
+Configure `WCAC_ENCRYPTION_KEY` before saving API credentials.

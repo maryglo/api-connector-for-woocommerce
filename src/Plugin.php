@@ -113,7 +113,7 @@ final class Plugin
 
 		echo '<div class="notice notice-error"><p>';
 		echo esc_html__(
-			'WooCommerce Integration Connector requires WooCommerce to be installed and active.',
+			'API Connector for WooCommerce requires WooCommerce to be installed and active.',
 			self::TEXT_DOMAIN
 		);
 		echo '</p></div>';

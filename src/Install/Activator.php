@@ -24,7 +24,7 @@ final class Activator
 			deactivate_plugins(plugin_basename(WCAC_FILE));
 			wp_die(
 				esc_html__(
-					'WooCommerce Integration Connector requires WooCommerce to be installed and active.',
+					'API Connector for WooCommerce requires WooCommerce to be installed and active.',
 					Plugin::TEXT_DOMAIN
 				),
 				esc_html__('Plugin activation failed', Plugin::TEXT_DOMAIN),
