@@ -53,6 +53,7 @@ final class Schema
 			KEY resource (resource_type,resource_id)
 		) {$collate};";
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- dbDelta is required to create or update the plugin's custom table.
 		dbDelta($sql);
 	}
 
@@ -62,7 +63,7 @@ final class Schema
 
 		$table = self::table_name();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query("DROP TABLE IF EXISTS {$table}");
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.NoCaching -- Required to remove the plugin's custom table.
+		$wpdb->query($wpdb->prepare('DROP TABLE IF EXISTS %i', $table));
 	}
 }

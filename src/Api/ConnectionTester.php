@@ -36,7 +36,7 @@ final class ConnectionTester
 				'code'    => 0,
 				'message' => sprintf(
 					/* translators: %s: error message from the HTTP API */
-					__('Connection failed: %s', Plugin::TEXT_DOMAIN),
+					__('Connection failed: %s', 'api-connector-for-woocommerce'),
 				$response->error_message
 				),
 			);
@@ -49,13 +49,13 @@ final class ConnectionTester
 		if ($success) {
 			$message = sprintf(
 				/* translators: %d: HTTP status code */
-				__('Connection succeeded (HTTP %d).', Plugin::TEXT_DOMAIN),
+				__('Connection succeeded (HTTP %d).', 'api-connector-for-woocommerce'),
 				$code
 			);
 		} else {
 			$message = sprintf(
 				/* translators: %d: HTTP status code */
-				__('Connection failed (HTTP %d).', Plugin::TEXT_DOMAIN),
+				__('Connection failed (HTTP %d).', 'api-connector-for-woocommerce'),
 				$code
 			);
 		}
@@ -63,7 +63,7 @@ final class ConnectionTester
 		if (! $success && '' !== $snippet) {
 			$message .= ' ' . sprintf(
 				/* translators: %s: truncated response body */
-				__('Response: %s', Plugin::TEXT_DOMAIN),
+				__('Response: %s', 'api-connector-for-woocommerce'),
 				$snippet
 			);
 		}

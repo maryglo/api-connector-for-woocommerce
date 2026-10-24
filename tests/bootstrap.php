@@ -2,7 +2,13 @@
 
 declare(strict_types=1);
 
-define('ABSPATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
+if (! defined('ABSPATH')) {
+	if ('cli' !== PHP_SAPI) {
+		exit;
+	}
+
+	define('ABSPATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
+}
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -73,10 +79,18 @@ if (! class_exists('WP_Error')) {
 	}
 }
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- These stubs mirror WordPress globals for isolated tests.
 if (! function_exists('__')) {
 	function __(string $text, string $domain = 'default'): string
 	{
 		return $text;
+	}
+}
+
+if (! function_exists('esc_html')) {
+	function esc_html(string $text): string
+	{
+		return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 	}
 }
 
@@ -106,7 +120,21 @@ if (! function_exists('update_option')) {
 if (! function_exists('sanitize_text_field')) {
 	function sanitize_text_field(string $value): string
 	{
-		return trim(strip_tags($value));
+		return trim(wp_strip_all_tags($value));
+	}
+}
+
+if (! function_exists('wp_strip_all_tags')) {
+	function wp_strip_all_tags(string $text, bool $remove_breaks = false): string
+	{
+		$text = preg_replace('@<(script|style)[^>]*?>.*?</\\1>@si', '', $text) ?? $text;
+		$text = preg_replace('/<[^>]*>/', '', $text) ?? $text;
+
+		if ($remove_breaks) {
+			$text = preg_replace('/[\\r\\n\\t ]+/', ' ', $text) ?? $text;
+		}
+
+		return $text;
 	}
 }
 
@@ -164,6 +192,7 @@ if (! function_exists('wp_remote_retrieve_body')) {
 if (! function_exists('wp_parse_url')) {
 	function wp_parse_url(string $url, int $component = -1): mixed
 	{
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- Native fallback for standalone tests without WordPress loaded.
 		return parse_url($url, $component);
 	}
 }
@@ -174,3 +203,4 @@ if (! function_exists('current_time')) {
 		return '2026-01-01 00:00:00';
 	}
 }
+// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound

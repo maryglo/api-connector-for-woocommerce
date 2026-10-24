@@ -19,6 +19,6 @@
 		"sort-packages": true
 	},
 	"scripts": {
-		"test": "@php vendor/bin/phpunit --configuration phpunit.xml.dist"
+		"test": "@php vendor/bin/phpunit --bootstrap tests/bootstrap.php tests"
 	}
 }

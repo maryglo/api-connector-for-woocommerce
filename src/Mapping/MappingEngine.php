@@ -20,7 +20,7 @@ final class MappingEngine
 	{
 		$errors = MappingValidator::validate_rows($rows);
 		if (array() !== $errors) {
-			throw new \InvalidArgumentException(implode(' ', $errors));
+			throw new \InvalidArgumentException(esc_html(implode(' ', $errors)));
 		}
 		$payload = array();
 		$item_rows = array();

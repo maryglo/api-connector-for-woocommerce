@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace WooCommerceApiConnector\Mapping;
 
-use WooCommerceApiConnector\Plugin;
 defined('ABSPATH') || exit;
 
 /**
@@ -20,10 +19,12 @@ final class MappingValidator
 			$source = is_array($row) ? trim((string) ($row['source'] ?? '')) : '';
 			$path = is_array($row) ? trim((string) ($row['destination'] ?? '')) : '';
 			if ('' === $source) {
-				$errors[] = sprintf(__('Mapping row %d requires a source.', Plugin::TEXT_DOMAIN), $index + 1);
+				/* translators: %d: mapping row number. */
+				$errors[] = sprintf(__('Mapping row %d requires a source.', 'api-connector-for-woocommerce'), $index + 1);
 			}
 			if (! self::is_valid_destination($path)) {
-				$errors[] = sprintf(__('Mapping row %d has an invalid destination path.', Plugin::TEXT_DOMAIN), $index + 1);
+				/* translators: %d: mapping row number. */
+				$errors[] = sprintf(__('Mapping row %d has an invalid destination path.', 'api-connector-for-woocommerce'), $index + 1);
 			}
 		}
 		return $errors;

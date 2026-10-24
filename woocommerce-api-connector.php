@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       API Connector for WooCommerce
- * Plugin URI:        https://github.com/woocommerce-api-connector/woocommerce-api-connector
+ * Plugin URI:        https://github.com/maryglo/api-connector-for-woocommerce
  * Description:       Send WooCommerce orders, customers, and products to external REST APIs using configurable field mappings.
  * Version:           0.1.1
  * Requires at least: 6.4
@@ -10,7 +10,7 @@
  * Author:            Mary Glo De La Pedra
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       woocommerce-api-connector
+ * Text Domain:       api-connector-for-woocommerce
  * Domain Path:       /languages
  *
  * @package WooCommerceApiConnector
@@ -38,7 +38,7 @@ if (! is_readable($wcac_autoload)) {
 			echo '<div class="notice notice-error"><p>';
 			echo esc_html__(
 				'API Connector for WooCommerce cannot load because Composer autoload is missing. Run composer install in the plugin directory.',
-				'woocommerce-api-connector'
+				'api-connector-for-woocommerce'
 			);
 			echo '</p></div>';
 		}

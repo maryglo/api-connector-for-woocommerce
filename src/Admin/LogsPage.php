@@ -24,7 +24,8 @@ final class LogsPage
 			return;
 		}
 
-		$log_id = absint($_GET['log_id'] ?? 0);
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Viewing a log detail is read-only.
+		$log_id = absint(wp_unslash($_GET['log_id'] ?? 0));
 
 		if ($log_id) {
 			self::detail($log_id);
@@ -36,12 +37,12 @@ final class LogsPage
 		<table class="widefat striped">
 			<thead>
 				<tr>
-					<th><?php echo esc_html__('ID', Plugin::TEXT_DOMAIN); ?></th>
-					<th><?php esc_html_e('Event', Plugin::TEXT_DOMAIN); ?></th>
-					<th><?php esc_html_e('Resource', Plugin::TEXT_DOMAIN); ?></th>
-					<th><?php esc_html_e('Status', Plugin::TEXT_DOMAIN); ?></th>
-					<th><?php esc_html_e('Attempts', Plugin::TEXT_DOMAIN); ?></th>
-					<th><?php esc_html_e('Updated', Plugin::TEXT_DOMAIN); ?></th>
+					<th><?php echo esc_html__('ID', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Event', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Resource', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Status', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Attempts', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Updated', 'api-connector-for-woocommerce'); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -50,7 +51,7 @@ final class LogsPage
 				if (array() === $logs) :
 					?>
 					<tr>
-						<td colspan="6"><?php esc_html_e('No integration logs yet.', Plugin::TEXT_DOMAIN); ?></td>
+						<td colspan="6"><?php esc_html_e('No integration logs yet.', 'api-connector-for-woocommerce'); ?></td>
 					</tr>
 				<?php else : ?>
 					<?php foreach ($logs as $log) : ?>
@@ -78,25 +79,25 @@ final class LogsPage
 		$log = IntegrationLogger::find($id);
 
 		if (! $log) {
-			wp_die(esc_html__('Log entry not found.', Plugin::TEXT_DOMAIN));
+			wp_die(esc_html__('Log entry not found.', 'api-connector-for-woocommerce'));
 		}
 
 		$back_url     = admin_url('admin.php?page=' . SettingsPage::MENU_SLUG . '&tab=' . SettingsPage::TAB_LOGS);
 		$resource_url = self::resource_admin_url((string) $log->resource_type, (int) $log->resource_id);
 		$is_test      = ! empty($log->is_test);
 		?>
-		<h2><?php esc_html_e('Integration Log', Plugin::TEXT_DOMAIN); ?> #<?php echo esc_html((string) $log->id); ?></h2>
+		<h2><?php esc_html_e('Integration Log', 'api-connector-for-woocommerce'); ?> #<?php echo esc_html((string) $log->id); ?></h2>
 		<p>
-			<a href="<?php echo esc_url($back_url); ?>">&larr; <?php esc_html_e('Back to logs', Plugin::TEXT_DOMAIN); ?></a>
+			<a href="<?php echo esc_url($back_url); ?>">&larr; <?php esc_html_e('Back to logs', 'api-connector-for-woocommerce'); ?></a>
 		</p>
 		<table class="widefat">
 			<tbody>
 				<tr>
-					<th><?php esc_html_e('Event', Plugin::TEXT_DOMAIN); ?></th>
+					<th><?php esc_html_e('Event', 'api-connector-for-woocommerce'); ?></th>
 					<td><?php echo esc_html($log->event_type); ?></td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Resource', Plugin::TEXT_DOMAIN); ?></th>
+					<th><?php esc_html_e('Resource', 'api-connector-for-woocommerce'); ?></th>
 					<td>
 						<?php if ($resource_url) : ?>
 							<a href="<?php echo esc_url($resource_url); ?>">
@@ -108,30 +109,30 @@ final class LogsPage
 					</td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Status', Plugin::TEXT_DOMAIN); ?></th>
-					<td><?php echo esc_html($log->status); ?> (<?php echo esc_html((string) $log->attempts); ?> <?php esc_html_e('attempts', Plugin::TEXT_DOMAIN); ?>)</td>
+					<th><?php esc_html_e('Status', 'api-connector-for-woocommerce'); ?></th>
+					<td><?php echo esc_html($log->status); ?> (<?php echo esc_html((string) $log->attempts); ?> <?php esc_html_e('attempts', 'api-connector-for-woocommerce'); ?>)</td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Test request', Plugin::TEXT_DOMAIN); ?></th>
-					<td><?php echo esc_html($is_test ? __('Yes', Plugin::TEXT_DOMAIN) : __('No', Plugin::TEXT_DOMAIN)); ?></td>
+					<th><?php esc_html_e('Test request', 'api-connector-for-woocommerce'); ?></th>
+					<td><?php echo esc_html($is_test ? __('Yes', 'api-connector-for-woocommerce') : __('No', 'api-connector-for-woocommerce')); ?></td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Created', Plugin::TEXT_DOMAIN); ?></th>
+					<th><?php esc_html_e('Created', 'api-connector-for-woocommerce'); ?></th>
 					<td><?php echo esc_html((string) $log->created_at); ?></td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Updated', Plugin::TEXT_DOMAIN); ?></th>
+					<th><?php esc_html_e('Updated', 'api-connector-for-woocommerce'); ?></th>
 					<td><?php echo esc_html((string) $log->updated_at); ?></td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Request', Plugin::TEXT_DOMAIN); ?></th>
+					<th><?php esc_html_e('Request', 'api-connector-for-woocommerce'); ?></th>
 					<td>
 						<?php echo esc_html($log->request_method . ' ' . $log->request_url); ?>
 						<pre><?php echo esc_html((string) $log->request_body); ?></pre>
 					</td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Response', Plugin::TEXT_DOMAIN); ?></th>
+					<th><?php esc_html_e('Response', 'api-connector-for-woocommerce'); ?></th>
 					<td>
 						<?php echo esc_html((string) $log->response_code); ?>
 						<pre><?php echo esc_html((string) $log->response_body); ?></pre>
