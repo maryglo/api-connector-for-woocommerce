@@ -24,10 +24,10 @@ final class Activator
 			deactivate_plugins(plugin_basename(WCAC_FILE));
 			wp_die(
 				esc_html__(
-					'API Connector for WooCommerce requires WooCommerce to be installed and active.',
-					'api-connector-for-woocommerce'
+					'StoreDispatcher - Outbound Integration for WooCommerce requires WooCommerce to be installed and active.',
+					'storedispatcher-outbound-integration-for-woocommerce'
 				),
-				esc_html__('Plugin activation failed', 'api-connector-for-woocommerce'),
+				esc_html__('Plugin activation failed', 'storedispatcher-outbound-integration-for-woocommerce'),
 				array('back_link' => true)
 			);
 		}

@@ -1,6 +1,6 @@
 {
 	"name": "woocommerce-api-connector/woocommerce-api-connector",
-	"description": "Configurable WooCommerce plugin that maps orders, customers, and products to custom JSON and sends them to an external REST API.",
+	"description": "Configurable WooCommerce order integration with an external REST API.",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
 	"require": {

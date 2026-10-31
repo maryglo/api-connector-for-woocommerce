@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name:       API Connector for WooCommerce
+ * Plugin Name:       StoreDispatcher - Outbound Integration for WooCommerce
  * Plugin URI:        https://github.com/maryglo/api-connector-for-woocommerce
- * Description:       Send WooCommerce orders, customers, and products to external REST APIs using configurable field mappings.
+ * Description:       Send WooCommerce order data to external REST APIs with configurable authentication, field mapping, retries, and request logs.
  * Version:           0.1.1
  * Requires at least: 6.4
  * Requires PHP:      8.1
@@ -10,7 +10,7 @@
  * Author:            Mary Glo De La Pedra
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       api-connector-for-woocommerce
+ * Text Domain:       storedispatcher-outbound-integration-for-woocommerce
  * Domain Path:       /languages
  *
  * @package WooCommerceApiConnector
@@ -37,8 +37,8 @@ if (! is_readable($wcac_autoload)) {
 
 			echo '<div class="notice notice-error"><p>';
 			echo esc_html__(
-				'API Connector for WooCommerce cannot load because Composer autoload is missing. Run composer install in the plugin directory.',
-				'api-connector-for-woocommerce'
+				'StoreDispatcher - Outbound Integration for WooCommerce cannot load because its Composer autoload file is missing. Install the plugin using the release package.',
+				'storedispatcher-outbound-integration-for-woocommerce'
 			);
 			echo '</p></div>';
 		}

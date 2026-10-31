@@ -20,11 +20,11 @@ final class MappingValidator
 			$path = is_array($row) ? trim((string) ($row['destination'] ?? '')) : '';
 			if ('' === $source) {
 				/* translators: %d: mapping row number. */
-				$errors[] = sprintf(__('Mapping row %d requires a source.', 'api-connector-for-woocommerce'), $index + 1);
+				$errors[] = sprintf(__('Mapping row %d requires a source.', 'storedispatcher-outbound-integration-for-woocommerce'), $index + 1);
 			}
 			if (! self::is_valid_destination($path)) {
 				/* translators: %d: mapping row number. */
-				$errors[] = sprintf(__('Mapping row %d has an invalid destination path.', 'api-connector-for-woocommerce'), $index + 1);
+				$errors[] = sprintf(__('Mapping row %d has an invalid destination path.', 'storedispatcher-outbound-integration-for-woocommerce'), $index + 1);
 			}
 		}
 		return $errors;

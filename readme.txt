@@ -1,4 +1,4 @@
-=== API Connector for WooCommerce ===
+=== StoreDispatcher - Outbound Integration for WooCommerce ===
 Contributors: glowkazaf
 Donate link: https://paypal.me/mgdelapedra
 Tags: woocommerce, rest-api, api, integration, orders
@@ -10,13 +10,13 @@ Stable tag: 0.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Connect store orders to external REST APIs with configurable authentication, field mapping, retries, and request logs.
+Connect WooCommerce orders to external REST APIs with configurable authentication, field mapping, retries, and request logs.
 
 == Description ==
 
-A lightweight, configurable plugin for connecting woocommerce online stores to external REST APIs.
+A lightweight, configurable plugin for connecting WooCommerce stores to external REST APIs.
 
-The plugin allows store owners and developers to send WooCommerce order data to third-party APIs without hard-coding a custom integration for every SaaS platform.
+The plugin sends order data when an order is created or completed. Store owners can configure the API connection, authentication, event triggers, and order field mappings in WordPress admin.
 
 Configure the API connection, authentication, events, and field mappings directly from the WordPress admin.
 
@@ -154,25 +154,21 @@ Clone the repository:
 git clone https://github.com/maryglo/api-connector-for-woocommerce.git
 ```
 
-Install PHP dependencies:
+The installable ZIP includes Composer's generated runtime autoloader; Composer is not required on the WordPress server. To build the ZIP from source, use PHP 8.1 or newer, run this from the repository root in PowerShell, then upload the ZIP under **Plugins → Add Plugin → Upload Plugin**:
 
-```bash
-composer install
+```powershell
+.\scripts\build-plugin.ps1
 ```
 
-Copy the plugin into your WordPress installation:
+The ZIP is written to `build/storedispatcher-outbound-integration-for-woocommerce.zip`. It includes `composer.json`, `composer.lock`, and the generated `vendor/` autoloader. The icon and screenshots remain in the source `assets/` folder and are excluded from the ZIP; the admin CSS and JavaScript are included.
 
-```text
-wp-content/plugins/api-connector-for-woocommerce/
-```
-
-Then activate it from:
+After installing the ZIP, activate it from:
 
 ```text
 WordPress Admin
 → Plugins
 → Installed Plugins
-→ API Connector for WooCommerce
+→ StoreDispatcher - Outbound Integration for WooCommerce
 ```
 
 == Requirements ==
@@ -220,12 +216,10 @@ Order Events
 └── Order completed
 
 Endpoints
-├── Order endpoint
-└── Customer endpoint
+└── Order endpoint
 
 Field Mapping
 ├── Order fields
-├── Customer fields
 └── Line-item fields
 ```
 
@@ -487,12 +481,6 @@ Run the test suite:
 composer test
 ```
 
-Run PHP syntax checks:
-
-```bash
-composer lint
-```
-
 Before deploying a new version, test the plugin against a real WooCommerce installation with:
 
 - HPOS enabled
@@ -553,7 +541,7 @@ api-connector-for-woocommerce/
 │   ├── Settings/
 │   └── Install/
 │
-├── assets/
+├── assets/ (admin CSS and JavaScript, icon, and directory screenshots)
 │
 ├── tests/
 │
@@ -563,7 +551,7 @@ api-connector-for-woocommerce/
 ├── composer.lock
 ├── readme.txt
 ├── uninstall.php
-└── woocommerce-api-connector.php
+└── storedispatcher-outbound-integration-for-woocommerce.php
 ```
 
 The project uses a modular architecture to keep WordPress-specific functionality separate from API communication and mapping logic.
@@ -591,12 +579,12 @@ The current version focuses on the core WooCommerce → REST API integration wor
 - Test payload generation
 - HPOS compatibility
 
-=== Planned ===
+=== Not implemented in this release ===
 
-The following features may be introduced in future releases:
+The current release sends order events only. Customer names, email addresses, and line items are available as fields within an order payload; standalone customer and product event delivery are not implemented.
 
-- Product synchronization
-- Customer events
+Other possible future improvements include:
+
 - Custom WooCommerce metadata mapping
 - Additional authentication methods
 - Advanced field transformations
@@ -670,8 +658,6 @@ This approach keeps production integrations predictable while using AI to reduce
 
 === V2+ ===
 
-- [ ] Product synchronization
-- [ ] Customer synchronization
 - [ ] Multiple integrations
 - [ ] Advanced transformations
 - [ ] Conditional mappings
@@ -748,9 +734,13 @@ Issues and feature requests are welcome.
 
 == Frequently Asked Questions ==
 
+= Does this send customer or product events? =
+
+No. This release sends order-created and order-completed events. Customer details and products in an order can be included in its mapped payload, but separate customer and product synchronization are not implemented.
+
 = Can this connect to any REST API? =
 
-The plugin can send order data to REST APIs that accept JSON requests. Configure the API URL, authentication, endpoints, and field mappings to match the destination API.
+The plugin can send order data to REST APIs that accept JSON requests. Configure the API URL, authentication, order endpoint, and field mappings to match the destination API.
 
 = Can I create nested objects and line-item arrays? =
 
