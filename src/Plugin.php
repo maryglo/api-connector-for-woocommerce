@@ -20,9 +20,9 @@ final class Plugin
 {
 	public const VERSION = '0.1.1';
 
-	public const SLUG = 'api-connector-for-woocommerce';
+	public const SLUG = 'storedispatcher-outbound-integration-for-woocommerce';
 
-	public const TEXT_DOMAIN = 'api-connector-for-woocommerce';
+	public const TEXT_DOMAIN = 'storedispatcher-outbound-integration-for-woocommerce';
 
 	public const OPTION_SETTINGS = 'wcac_settings';
 
@@ -107,8 +107,8 @@ final class Plugin
 
 		echo '<div class="notice notice-error"><p>';
 		echo esc_html__(
-			'API Connector for WooCommerce requires WooCommerce to be installed and active.',
-			'api-connector-for-woocommerce'
+			'StoreDispatcher - Outbound Integration for WooCommerce requires WooCommerce to be installed and active.',
+			'storedispatcher-outbound-integration-for-woocommerce'
 		);
 		echo '</p></div>';
 	}

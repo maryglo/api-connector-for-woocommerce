@@ -37,12 +37,12 @@ final class LogsPage
 		<table class="widefat striped">
 			<thead>
 				<tr>
-					<th><?php echo esc_html__('ID', 'api-connector-for-woocommerce'); ?></th>
-					<th><?php esc_html_e('Event', 'api-connector-for-woocommerce'); ?></th>
-					<th><?php esc_html_e('Resource', 'api-connector-for-woocommerce'); ?></th>
-					<th><?php esc_html_e('Status', 'api-connector-for-woocommerce'); ?></th>
-					<th><?php esc_html_e('Attempts', 'api-connector-for-woocommerce'); ?></th>
-					<th><?php esc_html_e('Updated', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php echo esc_html__('ID', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Event', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Resource', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Status', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Attempts', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Updated', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -51,7 +51,7 @@ final class LogsPage
 				if (array() === $logs) :
 					?>
 					<tr>
-						<td colspan="6"><?php esc_html_e('No integration logs yet.', 'api-connector-for-woocommerce'); ?></td>
+						<td colspan="6"><?php esc_html_e('No integration logs yet.', 'storedispatcher-outbound-integration-for-woocommerce'); ?></td>
 					</tr>
 				<?php else : ?>
 					<?php foreach ($logs as $log) : ?>
@@ -79,25 +79,25 @@ final class LogsPage
 		$log = IntegrationLogger::find($id);
 
 		if (! $log) {
-			wp_die(esc_html__('Log entry not found.', 'api-connector-for-woocommerce'));
+			wp_die(esc_html__('Log entry not found.', 'storedispatcher-outbound-integration-for-woocommerce'));
 		}
 
 		$back_url     = admin_url('admin.php?page=' . SettingsPage::MENU_SLUG . '&tab=' . SettingsPage::TAB_LOGS);
 		$resource_url = self::resource_admin_url((string) $log->resource_type, (int) $log->resource_id);
 		$is_test      = ! empty($log->is_test);
 		?>
-		<h2><?php esc_html_e('Integration Log', 'api-connector-for-woocommerce'); ?> #<?php echo esc_html((string) $log->id); ?></h2>
+		<h2><?php esc_html_e('Integration Log', 'storedispatcher-outbound-integration-for-woocommerce'); ?> #<?php echo esc_html((string) $log->id); ?></h2>
 		<p>
-			<a href="<?php echo esc_url($back_url); ?>">&larr; <?php esc_html_e('Back to logs', 'api-connector-for-woocommerce'); ?></a>
+			<a href="<?php echo esc_url($back_url); ?>">&larr; <?php esc_html_e('Back to logs', 'storedispatcher-outbound-integration-for-woocommerce'); ?></a>
 		</p>
 		<table class="widefat">
 			<tbody>
 				<tr>
-					<th><?php esc_html_e('Event', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Event', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
 					<td><?php echo esc_html($log->event_type); ?></td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Resource', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Resource', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
 					<td>
 						<?php if ($resource_url) : ?>
 							<a href="<?php echo esc_url($resource_url); ?>">
@@ -109,30 +109,30 @@ final class LogsPage
 					</td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Status', 'api-connector-for-woocommerce'); ?></th>
-					<td><?php echo esc_html($log->status); ?> (<?php echo esc_html((string) $log->attempts); ?> <?php esc_html_e('attempts', 'api-connector-for-woocommerce'); ?>)</td>
+					<th><?php esc_html_e('Status', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
+					<td><?php echo esc_html($log->status); ?> (<?php echo esc_html((string) $log->attempts); ?> <?php esc_html_e('attempts', 'storedispatcher-outbound-integration-for-woocommerce'); ?>)</td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Test request', 'api-connector-for-woocommerce'); ?></th>
-					<td><?php echo esc_html($is_test ? __('Yes', 'api-connector-for-woocommerce') : __('No', 'api-connector-for-woocommerce')); ?></td>
+					<th><?php esc_html_e('Test request', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
+					<td><?php echo esc_html($is_test ? __('Yes', 'storedispatcher-outbound-integration-for-woocommerce') : __('No', 'storedispatcher-outbound-integration-for-woocommerce')); ?></td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Created', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Created', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
 					<td><?php echo esc_html((string) $log->created_at); ?></td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Updated', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Updated', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
 					<td><?php echo esc_html((string) $log->updated_at); ?></td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Request', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Request', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
 					<td>
 						<?php echo esc_html($log->request_method . ' ' . $log->request_url); ?>
 						<pre><?php echo esc_html((string) $log->request_body); ?></pre>
 					</td>
 				</tr>
 				<tr>
-					<th><?php esc_html_e('Response', 'api-connector-for-woocommerce'); ?></th>
+					<th><?php esc_html_e('Response', 'storedispatcher-outbound-integration-for-woocommerce'); ?></th>
 					<td>
 						<?php echo esc_html((string) $log->response_code); ?>
 						<pre><?php echo esc_html((string) $log->response_body); ?></pre>

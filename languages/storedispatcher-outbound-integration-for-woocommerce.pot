@@ -1,8 +1,8 @@
-# Copyright (C) 2026 API Connector for WooCommerce
-# This file is distributed under the same license as the API Connector for WooCommerce plugin.
+# Copyright (C) 2026 StoreDispatcher - Outbound Integration for WooCommerce
+# This file is distributed under the same license as the StoreDispatcher - Outbound Integration for WooCommerce plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: API Connector for WooCommerce 0.1.1\n"
+"Project-Id-Version: StoreDispatcher - Outbound Integration for WooCommerce 0.1.1\n"
 "Report-Msgid-Bugs-To: https://github.com/maryglo/api-connector-for-woocommerce\n"
 "POT-Creation-Date: 2026-08-31 00:00+0000\n"
 "MIME-Version: 1.0\n"

@@ -29,7 +29,6 @@ final class Settings
 			'token'             => '',
 			'api_key_header'    => 'X-API-Key',
 			'order_endpoint'    => '/api/orders',
-			'customer_endpoint' => '/api/customers',
 			'events'            => array(
 				'order_created'   => true,
 				'order_completed' => true,

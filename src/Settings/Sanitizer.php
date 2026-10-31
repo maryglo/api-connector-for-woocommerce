@@ -62,7 +62,6 @@ final class Sanitizer
 				isset($raw['api_key_header']) ? (string) $raw['api_key_header'] : 'X-API-Key'
 			),
 			'order_endpoint'    => self::sanitize_relative_path(isset($raw['order_endpoint']) ? (string) $raw['order_endpoint'] : '/api/orders', false),
-			'customer_endpoint' => self::sanitize_relative_path(isset($raw['customer_endpoint']) ? (string) $raw['customer_endpoint'] : '/api/customers', false),
 			'events'            => array(
 				'order_created'   => ! empty($events_raw['order_created']),
 				'order_completed' => ! empty($events_raw['order_completed']),
@@ -80,29 +79,26 @@ final class Sanitizer
 		$errors = array();
 
 		if ('' === ($settings['api_name'] ?? '')) {
-			$errors[] = __('API Name is required.', 'api-connector-for-woocommerce');
+			$errors[] = __('API Name is required.', 'storedispatcher-outbound-integration-for-woocommerce');
 		}
 
 		if ('' === ($settings['base_url'] ?? '')) {
-			$errors[] = __('Base URL is required.', 'api-connector-for-woocommerce');
+			$errors[] = __('Base URL is required.', 'storedispatcher-outbound-integration-for-woocommerce');
 		} elseif (false === wp_http_validate_url($settings['base_url'])) {
-			$errors[] = __('Base URL must be a valid URL.', 'api-connector-for-woocommerce');
+			$errors[] = __('Base URL must be a valid URL.', 'storedispatcher-outbound-integration-for-woocommerce');
 		}
 
 		if (self::path_is_absolute((string) ($settings['health_path'] ?? ''))) {
-			$errors[] = __('Health path must be a path, not an absolute URL.', 'api-connector-for-woocommerce');
+			$errors[] = __('Health path must be a path, not an absolute URL.', 'storedispatcher-outbound-integration-for-woocommerce');
 		}
 
 		if (self::path_is_absolute((string) ($settings['order_endpoint'] ?? ''))) {
-			$errors[] = __('Order endpoint must be a path, not an absolute URL.', 'api-connector-for-woocommerce');
+			$errors[] = __('Order endpoint must be a path, not an absolute URL.', 'storedispatcher-outbound-integration-for-woocommerce');
 		}
 
-		if (self::path_is_absolute((string) ($settings['customer_endpoint'] ?? ''))) {
-			$errors[] = __('Customer endpoint must be a path, not an absolute URL.', 'api-connector-for-woocommerce');
-		}
 
 		if (self::AUTH_API_KEY === ($settings['auth_method'] ?? '') && '' === ($settings['api_key_header'] ?? '')) {
-			$errors[] = __('API key header name is required when using API Key authentication.', 'api-connector-for-woocommerce');
+			$errors[] = __('API key header name is required when using API Key authentication.', 'storedispatcher-outbound-integration-for-woocommerce');
 		}
 
 		return $errors;
@@ -117,9 +113,9 @@ final class Sanitizer
 		$errors = array();
 
 		if ('' === ($settings['base_url'] ?? '')) {
-			$errors[] = __('Base URL is required to test the connection.', 'api-connector-for-woocommerce');
+			$errors[] = __('Base URL is required to test the connection.', 'storedispatcher-outbound-integration-for-woocommerce');
 		} elseif (false === wp_http_validate_url($settings['base_url'])) {
-			$errors[] = __('Base URL must be a valid URL.', 'api-connector-for-woocommerce');
+			$errors[] = __('Base URL must be a valid URL.', 'storedispatcher-outbound-integration-for-woocommerce');
 		}
 
 		return $errors;
