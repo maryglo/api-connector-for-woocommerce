@@ -46,35 +46,22 @@ Map WooCommerce order data to the structure required by your external API.
 
 Example:
 
-```text
-WooCommerce Field              API Field
-────────────────────────────────────────────
-Order ID                       order_id
-Order Number                   order.reference
-Order Status                   order.status
-Currency                       order.currency
-Order Total                    order.total
-Billing Email                  customer.email
-Billing First Name             customer.first_name
-Billing Last Name              customer.last_name
-```
+    WooCommerce Field              API Field
+    ────────────────────────────────────────────
+    Order ID                       order_id
+    Order Number                   order.reference
+    Order Status                   order.status
+    Currency                       order.currency
+    Order Total                    order.total
+    Billing Email                  customer.email
+    Billing First Name             customer.first_name
+    Billing Last Name              customer.last_name
 
-The mapping engine supports nested destination structures such as:
 
-```text
-customer.email
-customer.address.city
-order.shipping.postcode
-```
+The mapping engine supports nested destination structures such as `customer.email`, `customer.address.city`, and `order.shipping.postcode`.
 
-Line items can also be mapped into arrays:
+Line items can also be mapped into arrays. For example, map `items[].sku`, `items[].name`, `items[].quantity`, and `items[].price`.
 
-```text
-items[].sku
-items[].name
-items[].quantity
-items[].price
-```
 
 === Integration Logging ===
 
@@ -110,35 +97,34 @@ Orders are accessed through WooCommerce's order APIs rather than directly queryi
 
 The plugin follows a simple integration pipeline:
 
-```text
-                  WooCommerce
-                       │
-                       ▼
-                 Order Event
-                       │
-                       ▼
-              Integration Job
-                       │
-                       ▼
-                Mapping Engine
-                       │
-             ┌─────────┴─────────┐
-             │                   │
-       Field Resolver       Transformer
-             │                   │
-             └─────────┬─────────┘
-                       ▼
-                 JSON Payload
-                       │
-                       ▼
-                  API Client
-                       │
-                       ▼
-              External REST API
-                       │
-                       ▼
-               Integration Log
-```
+                      WooCommerce
+                           │
+                           ▼
+                     Order Event
+                           │
+                           ▼
+                  Integration Job
+                           │
+                           ▼
+                    Mapping Engine
+                           │
+                 ┌─────────┴─────────┐
+                 │                   │
+           Field Resolver       Transformer
+                 │                   │
+                 └─────────┬─────────┘
+                           ▼
+                     JSON Payload
+                           │
+                           ▼
+                      API Client
+                           │
+                           ▼
+                  External REST API
+                           │
+                           ▼
+                   Integration Log
+
 
 The integration is intentionally separated into independent components so the API client, mapping engine, event handling, and logging can evolve independently.
 
@@ -150,26 +136,17 @@ The integration is intentionally separated into independent components so the AP
 
 Clone the repository:
 
-```bash
-git clone https://github.com/maryglo/api-connector-for-woocommerce.git
-```
+    git clone https://github.com/maryglo/api-connector-for-woocommerce.git
+
 
 The installable ZIP includes Composer's generated runtime autoloader; Composer is not required on the WordPress server. To build the ZIP from source, use PHP 8.1 or newer, run this from the repository root in PowerShell, then upload the ZIP under **Plugins → Add Plugin → Upload Plugin**:
 
-```powershell
-.\scripts\build-plugin.ps1
-```
+    .\scripts\build-plugin.ps1
+
 
 The ZIP is written to `build/storedispatcher-outbound-integration-for-woocommerce.zip`. It includes `composer.json`, `composer.lock`, and the generated `vendor/` autoloader. The icon and screenshots remain in the source `assets/` folder and are excluded from the ZIP; the admin CSS and JavaScript are included.
 
-After installing the ZIP, activate it from:
-
-```text
-WordPress Admin
-→ Plugins
-→ Installed Plugins
-→ StoreDispatcher - Outbound Integration for WooCommerce
-```
+After installing the ZIP, activate **StoreDispatcher - Outbound Integration for WooCommerce** under **WordPress Admin → Plugins → Installed Plugins**.
 
 == Requirements ==
 
@@ -194,34 +171,32 @@ Test the plugin in a staging environment before deploying it to a production sto
 
 After activating the plugin, open:
 
-```text
-WordPress Admin
-→ WooCommerce
-→ API Connector
-```
+    WordPress Admin
+    → WooCommerce
+    → API Connector
+
 
 Configure:
 
-```text
-API Connection
-├── API Name
-├── API Base URL
-├── Health Path
-├── Authentication method
-├── API credentials
-└── Connection test
+    API Connection
+    ├── API Name
+    ├── API Base URL
+    ├── Health Path
+    ├── Authentication method
+    ├── API credentials
+    └── Connection test
 
-Order Events
-├── Order created
-└── Order completed
+    Order Events
+    ├── Order created
+    └── Order completed
 
-Endpoints
-└── Order endpoint
+    Endpoints
+    └── Order endpoint
 
-Field Mapping
-├── Order fields
-└── Line-item fields
-```
+    Field Mapping
+    ├── Order fields
+    └── Line-item fields
+
 
 Save the configuration and use the built-in connection test to verify communication with the external API.
 
@@ -233,51 +208,41 @@ The plugin uses this key to encrypt API credentials before storing them in the W
 
 Add:
 
-```php
-define('WCAC_ENCRYPTION_KEY', 'YOUR_BASE64_ENCODED_32_BYTE_KEY');
-```
+    define('WCAC_ENCRYPTION_KEY', 'YOUR_BASE64_ENCODED_32_BYTE_KEY');
+
 
 Generate a secure 32-byte key with PHP:
 
-```bash
-php -r "echo base64_encode(random_bytes(32)), PHP_EOL;"
-```
+    php -r "echo base64_encode(random_bytes(32)), PHP_EOL;"
+
 
 Copy the generated value into `wp-config.php`:
 
-```php
-define('WCAC_ENCRYPTION_KEY', 'your-generated-base64-key');
-```
+    define('WCAC_ENCRYPTION_KEY', 'your-generated-base64-key');
 
-Place the constant before:
 
-```php
-/* That's all, stop editing! Happy publishing. */
-```
+Place the constant before `/* That's all, stop editing! Happy publishing. */` in `wp-config.php`.
 
 === Docker environments ===
 
 If WordPress is running in Docker, the key can be generated inside the WordPress container:
 
-```bash
-docker compose exec wordpress php -r "echo base64_encode(random_bytes(32)), PHP_EOL;"
-```
+    docker compose exec wordpress php -r "echo base64_encode(random_bytes(32)), PHP_EOL;"
+
 
 The key can also be provided through the container environment.
 
 For example, in `.env`:
 
-```env
-WCAC_ENCRYPTION_KEY=your-generated-base64-key
-```
+    WCAC_ENCRYPTION_KEY=your-generated-base64-key
+
 
 Then expose it to the WordPress container and load it from `wp-config.php`:
 
-```php
-if (getenv('WCAC_ENCRYPTION_KEY')) {
-	define('WCAC_ENCRYPTION_KEY', getenv('WCAC_ENCRYPTION_KEY'));
-}
-```
+    if (getenv('WCAC_ENCRYPTION_KEY')) {
+        define('WCAC_ENCRYPTION_KEY', getenv('WCAC_ENCRYPTION_KEY'));
+    }
+
 
 Do not commit `.env` files containing the encryption key to source control.
 
@@ -302,19 +267,11 @@ The connector supports configurable API authentication.
 
 === Bearer Token ===
 
-Example:
-
-```http
-Authorization: Bearer YOUR_TOKEN
-```
+Send the header `Authorization: Bearer YOUR_TOKEN`.
 
 === API Key ===
 
-Example:
-
-```http
-X-API-Key: YOUR_API_KEY
-```
+Send the header `X-API-Key: YOUR_API_KEY`.
 
 The API credential is encrypted before being stored in the WordPress database.
 
@@ -328,9 +285,8 @@ For high-security deployments, an API credential can also be provided through th
 
 Example:
 
-```php
-define('WCAC_API_KEY', 'YOUR_API_CREDENTIAL');
-```
+    define('WCAC_API_KEY', 'YOUR_API_CREDENTIAL');
+
 
 When configured, this server-managed credential takes precedence over the credential stored by the plugin.
 
@@ -340,16 +296,15 @@ Keep the value outside source control and never commit production credentials to
 
 These are two different secrets:
 
-```text
-WCAC_API_KEY
-    │
-    └── External API credential
+    WCAC_API_KEY
+        │
+        └── External API credential
 
-WCAC_ENCRYPTION_KEY
-    │
-    └── Local encryption key used to protect
-        credentials stored by the plugin
-```
+    WCAC_ENCRYPTION_KEY
+        │
+        └── Local encryption key used to protect
+            credentials stored by the plugin
+
 
 The encryption key does not authenticate requests to the external API.
 
@@ -361,37 +316,36 @@ The encryption key does not authenticate requests to the external API.
 
 When a configured WooCommerce event occurs, the plugin creates an asynchronous integration job.
 
-```text
-Order Event
-    │
-    ▼
-Create Integration Job
-    │
-    ▼
-Action Scheduler
-    │
-    ▼
-Load WooCommerce Order
-    │
-    ▼
-Apply Field Mapping
-    │
-    ▼
-Generate JSON Payload
-    │
-    ▼
-Send REST API Request
-    │
-    ├── Success
-    │      ↓
-    │   Log success
-    │
-    └── Failure
-           ↓
-        Retry
-           ↓
-        Log failure
-```
+    Order Event
+        │
+        ▼
+    Create Integration Job
+        │
+        ▼
+    Action Scheduler
+        │
+        ▼
+    Load WooCommerce Order
+        │
+        ▼
+    Apply Field Mapping
+        │
+        ▼
+    Generate JSON Payload
+        │
+        ▼
+    Send REST API Request
+        │
+        ├── Success
+        │      ↓
+        │   Log success
+        │
+        └── Failure
+               ↓
+            Retry
+               ↓
+            Log failure
+
 
 Using asynchronous processing prevents the external API request from unnecessarily blocking the WooCommerce order lifecycle.
 
@@ -411,25 +365,24 @@ The connector can retry failed integration jobs according to its configured retr
 
 A typical flow is:
 
-```text
-Attempt 1
-   │
-   └── Failed
-         ↓
-       Retry
-         ↓
-Attempt 2
-   │
-   └── Failed
-         ↓
-       Retry
-         ↓
-Attempt 3
-   │
-   ├── Success
-   │
-   └── Failed → Mark as failed
-```
+    Attempt 1
+       │
+       └── Failed
+             ↓
+           Retry
+             ↓
+    Attempt 2
+       │
+       └── Failed
+             ↓
+           Retry
+             ↓
+    Attempt 3
+       │
+       ├── Success
+       │
+       └── Failed → Mark as failed
+
 
 ---
 
@@ -439,31 +392,29 @@ The mapping system separates WooCommerce data from the external API's payload st
 
 For example, a WooCommerce order might contain:
 
-```text
-Order ID
-Billing Email
-Billing First Name
-Billing Last Name
-Order Total
-Currency
-Line Items
-```
+    Order ID
+    Billing Email
+    Billing First Name
+    Billing Last Name
+    Order Total
+    Currency
+    Line Items
+
 
 The external API may expect:
 
-```json
-{
-  "externalOrderId": 12345,
-  "customer": {
-    "email": "customer@example.com",
-    "firstName": "John",
-    "lastName": "Doe"
-  },
-  "amount": 199.99,
-  "currency": "USD",
-  "items": []
-}
-```
+    {
+      "externalOrderId": 12345,
+      "customer": {
+        "email": "customer@example.com",
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "amount": 199.99,
+      "currency": "USD",
+      "items": []
+    }
+
 
 The mapping configuration determines how the WooCommerce data is transformed into the destination structure.
 
@@ -477,9 +428,8 @@ The project includes automated tests for core components.
 
 Run the test suite:
 
-```bash
-composer test
-```
+    composer test
+
 
 Before deploying a new version, test the plugin against a real WooCommerce installation with:
 
@@ -528,31 +478,30 @@ The plugin does not require access to the external API's source code or server i
 
 == Project Structure ==
 
-```text
-api-connector-for-woocommerce/
-│
-├── src/
-│   ├── Admin/
-│   ├── Api/
-│   ├── Mapping/
-│   ├── Orders/
-│   ├── Jobs/
-│   ├── Logging/
-│   ├── Settings/
-│   └── Install/
-│
-├── assets/ (admin CSS and JavaScript, icon, and directory screenshots)
-│
-├── tests/
-│
-├── languages/
-│
-├── composer.json
-├── composer.lock
-├── readme.txt
-├── uninstall.php
-└── storedispatcher-outbound-integration-for-woocommerce.php
-```
+    api-connector-for-woocommerce/
+    │
+    ├── src/
+    │   ├── Admin/
+    │   ├── Api/
+    │   ├── Mapping/
+    │   ├── Orders/
+    │   ├── Jobs/
+    │   ├── Logging/
+    │   ├── Settings/
+    │   └── Install/
+    │
+    ├── assets/ (admin CSS and JavaScript, icon, and directory screenshots)
+    │
+    ├── tests/
+    │
+    ├── languages/
+    │
+    ├── composer.json
+    ├── composer.lock
+    ├── readme.txt
+    ├── uninstall.php
+    └── storedispatcher-outbound-integration-for-woocommerce.php
+
 
 The project uses a modular architecture to keep WordPress-specific functionality separate from API communication and mapping logic.
 
@@ -606,24 +555,23 @@ The planned AI functionality will assist administrators during configuration rat
 
 For example:
 
-```text
-External API Schema
-        │
-        ▼
-AI Mapping Assistant
-        │
-        ▼
-Suggested WooCommerce Mappings
-        │
-        ▼
-Administrator Review
-        │
-        ▼
-Saved Mapping
-        │
-        ▼
-Deterministic Production Integration
-```
+    External API Schema
+            │
+            ▼
+    AI Mapping Assistant
+            │
+            ▼
+    Suggested WooCommerce Mappings
+            │
+            ▼
+    Administrator Review
+            │
+            ▼
+    Saved Mapping
+            │
+            ▼
+    Deterministic Production Integration
+
 
 This approach keeps production integrations predictable while using AI to reduce the time required to configure complex API mappings.
 
